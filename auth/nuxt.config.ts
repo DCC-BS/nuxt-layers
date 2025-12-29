@@ -3,5 +3,5 @@ export default defineNuxtConfig({
         name: 'auth',
     },
     devtools: { enabled: true },
-    extends: [process.env.AUTH_LAYER_URI ?? undefined]
+    extends: [[process.env.AUTH_LAYER_URI ?? undefined, { install: true }]],
 });
