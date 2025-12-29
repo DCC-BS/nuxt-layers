@@ -23,7 +23,7 @@ onMounted(() => {
     // Cycle through loading states
     const loadingInterval = setInterval(() => {
         currentStateIndex = (currentStateIndex + 1) % loadingStates.length;
-        loadingText.value = loadingStates[currentStateIndex];
+        loadingText.value = loadingStates[currentStateIndex] as string;
     }, 1000);
 
     setTimeout(() => {

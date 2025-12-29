@@ -55,6 +55,7 @@ export default NuxtAuthHandler({
         signIn: "/auth/signin",
     },
     providers: [
+        // @ts-ignore
         AzureAD.default({
             clientId: useRuntimeConfig().azureAdClientId,
             clientSecret: useRuntimeConfig().azureAdClientSecret,

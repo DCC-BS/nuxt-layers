@@ -12,7 +12,7 @@ type BuildContext<TRequest extends EventHandlerRequest, TBody, TResponse, TRespo
     extendFetchOptions: FetchOptionsExtender<TBody>,
 }
 
-async function defaultExtendFetchOptions<TBodyTransformed>(options: FetcherOptions<TBodyTransformed>) {
+async function defaultExtendFetchOptions<TBody>(options: FetcherOptions<TBody>) {
     return options;
 }
 
@@ -29,11 +29,19 @@ export function buildBackendHandler<TRequest extends EventHandlerRequest, TBody 
     };
 
     function withFetcher(fetcher: Fetcher<TBody, TResponse>) {
-        return buildBackendHandler({ ...ctx, fetcher });
+        const { withBodyProvider, withFetcher, ...builder } = buildBackendHandler({ ...ctx, fetcher });
+        return builder;
     }
 
-    function withBodyProvider(bodyProvider: BodyProvider<TRequest, TBody>) {
-        return buildBackendHandler({ ...ctx, bodyProvider });
+    function withBodyProvider<TNewBody>(bodyProvider: BodyProvider<TRequest, TNewBody>) {
+        const { withBodyProvider, ...builder } = buildBackendHandler<TRequest, TNewBody, TResponse, TResponseTransformed>({
+            ...ctx,
+            bodyProvider,
+            fetcher: defaultFetcher<TNewBody, TResponse>,
+            extendFetchOptions: ctx.extendFetchOptions as unknown as FetchOptionsExtender<TNewBody>,
+        });
+
+        return builder;
     }
 
     function withMethod(method: FetchMethodType) {
@@ -45,9 +53,11 @@ export function buildBackendHandler<TRequest extends EventHandlerRequest, TBody 
     }
 
     function postMap<TMap>(transformer: BackendTransformer<TResponseTransformed, TMap>) {
-        return buildBackendHandler({
+        const { withBodyProvider, withFetcher, ...builder } = buildBackendHandler({
             ...ctx, postFetchTransformer: async (x) => transformer(await ctx.postFetchTransformer(x))
         });
+
+        return builder;
     }
 
     function build(url: string): EventHandler<TRequest, Promise<TResponse>> {
@@ -59,7 +69,7 @@ export function buildBackendHandler<TRequest extends EventHandlerRequest, TBody 
                 // Get runtime configuration for API base URL
                 const config = useRuntimeConfig();
 
-                if(!config.apiUrl) {
+                if (!config.apiUrl) {
                     throw new Error("API URL is not configured in runtime config. Set the env variable API_URL.");
                 }
 
