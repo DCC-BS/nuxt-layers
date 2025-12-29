@@ -29,7 +29,11 @@ export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBod
     };
 
     function withFetcher<TNewResponse>(fetcher: Fetcher<TBody, TNewResponse>) {
-        const { withBodyProvider, withFetcher, ...builder } = backendHandlerBuilder<TRequest, TBody, TNewResponse, TNewResponse>({ ...ctx, fetcher });
+        const { withBodyProvider, withFetcher, ...builder } = backendHandlerBuilder<TRequest, TBody, TNewResponse, TNewResponse>({
+            ...ctx,
+            fetcher,
+            postFetchTransformer: defaultTransformer as BackendTransformer<TNewResponse, TNewResponse>
+        });
         return builder;
     }
 
