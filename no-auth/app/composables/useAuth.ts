@@ -6,7 +6,8 @@ export function useAppAuth(): UseAppAuthReturns {
         return {
             user: {
                 image: '',
-                name: ''
+                name: '',
+                email: '',
             }
         }
     });

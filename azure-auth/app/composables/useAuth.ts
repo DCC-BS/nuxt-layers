@@ -9,7 +9,8 @@ export function useAppAuth(): UseAppAuthReturns {
         return {
             user: {
                 image: nuxtData.value?.user?.image || '',
-                name: nuxtData.value?.user?.name || ''
+                name: nuxtData.value?.user?.name || '',
+                email: nuxtData.value?.user?.email || '',
             }
         }
     });
