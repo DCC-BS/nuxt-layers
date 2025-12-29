@@ -6,7 +6,6 @@ import { defaultFetcher, defaultTransformer, getDefaultBodyProvider } from '../t
 type FetchOptionsExtender<TBody> = (options: FetcherOptions<TBody>) => Promise<FetcherOptions<TBody>>;
 
 type BuildContext<TRequest extends EventHandlerRequest, TBody, TResponse, TResponseTransformed> = {
-    url?: string;
     fetcher: Fetcher<TBody, TResponse>;
     bodyProvider: BodyProvider<TRequest, TBody>;
     method: FetchMethodType;
@@ -52,14 +51,11 @@ export function buildBackendHandler<TRequest extends EventHandlerRequest, TBody 
         });
     }
 
-    function build(): EventHandler<TRequest, Promise<TResponse>> {
+    function build(url: string): EventHandler<TRequest, Promise<TResponse>> {
         return defineEventHandler<TRequest>(async (event: H3Event) => {
-            if (!ctx.url) {
-                throw new Error("URL is not defined for backend handler");
-            }
 
             try {
-                const { url, bodyProvider, fetcher, method, postFetchTransformer } = ctx;
+                const { bodyProvider, fetcher, method, extendFetchOptions, postFetchTransformer } = ctx;
 
                 // Get runtime configuration for API base URL
                 const config = useRuntimeConfig();
@@ -67,16 +63,18 @@ export function buildBackendHandler<TRequest extends EventHandlerRequest, TBody 
                 // Extract request body using the configured body provider
                 const body = await bodyProvider(event);
 
-                // Make authenticated request to backend API using the configured fetcher
-                const backendResponse = await fetcher({
+                const options = await extendFetchOptions({
                     url: `${config.apiUrl}${url}`,
                     method,
                     body: body,
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    event,
+                    event
                 });
+
+                // Make authenticated request to backend API using the configured fetcher
+                const backendResponse = await fetcher(options);
 
                 return await postFetchTransformer(backendResponse);
             } catch (err: unknown) {
