@@ -59,6 +59,10 @@ export function buildBackendHandler<TRequest extends EventHandlerRequest, TBody 
                 // Get runtime configuration for API base URL
                 const config = useRuntimeConfig();
 
+                if(!config.apiUrl) {
+                    throw new Error("API URL is not configured in runtime config. Set the env variable API_URL.");
+                }
+
                 // Extract request body using the configured body provider
                 const body = await bodyProvider(event);
 

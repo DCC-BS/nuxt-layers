@@ -18,7 +18,7 @@
     },
     "dependencies": {
         "@biomejs/biome": "^2.3.10",
-        "@sidebase/nuxt-auth": "^1.1.1"
+        "@sidebase/nuxt-auth": "1.0.0"
     },
     "peerDependencies": {
         "@nuxtjs/i18n": "^10.2.1"
