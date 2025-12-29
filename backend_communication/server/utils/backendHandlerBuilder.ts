@@ -1,6 +1,5 @@
 import { createError, defineEventHandler, type EventHandler, type EventHandlerRequest, type H3Event } from "h3";
-import { useRuntimeConfig } from 'nuxt/app';
-import type { BackendTransformer, BodyProvider, Fetcher, FetchMethodType, FetcherOptions } from '../types';
+import type { BackendTransformer, BodyProvider, Fetcher, FetcherOptions, FetchMethodType } from '../types';
 import { defaultFetcher, defaultTransformer, getDefaultBodyProvider } from '../types';
 
 type FetchOptionsExtender<TBody> = (options: FetcherOptions<TBody>) => Promise<FetcherOptions<TBody>>;
