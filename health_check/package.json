@@ -1,0 +1,23 @@
+{
+    "name": "health_check",
+    "type": "module",
+    "version": "0.0.1",
+    "main": "./nuxt.config.ts",
+    "scripts": {
+        "dev": "nuxi dev .playground",
+        "dev:prepare": "nuxt prepare .playground",
+        "build": "nuxt build .playground",
+        "generate": "nuxt generate .playground",
+        "preview": "nuxt preview .playground",
+        "lint": "eslint ."
+    },
+    "devDependencies": {
+        "@types/node": "^24.10.4",
+        "nuxt": "^4.2.2",
+        "typescript": "^5.9.3",
+        "vue": "latest"
+    },
+    "dependencies": {
+        "@dcc-bs/communication.bs.js": "^0.1.1"
+    }
+}
