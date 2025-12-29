@@ -33,7 +33,7 @@ export async function defaultFetcher<T>(
 
     const signal = getAbortSignal(event);
 
-    return await $fetch(url, {
+    return await $fetch<T>(url, {
         method,
         body: JSON.stringify(body),
         headers,
