@@ -16,8 +16,8 @@ async function defaultExtendFetchOptions<TBody>(options: FetcherOptions<TBody>) 
     return options;
 }
 
-export function buildBackendHandler<TRequest extends EventHandlerRequest, TBody = unknown, TResponse = unknown, TResponseTransformed = TResponse>(
-    context: BuildContext<TRequest, TBody, TResponse, TResponseTransformed> | null = null) {
+export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBody = unknown, TResponse = unknown, TResponseTransformed = TResponse>(
+    context: BuildContext<TRequest, TBody, TResponse, TResponseTransformed> | undefined = undefined) {
 
     const ctx = {
         fetcher: defaultFetcher<TBody, TResponse>,
@@ -28,13 +28,13 @@ export function buildBackendHandler<TRequest extends EventHandlerRequest, TBody 
         ...context
     };
 
-    function withFetcher(fetcher: Fetcher<TBody, TResponse>) {
-        const { withBodyProvider, withFetcher, ...builder } = buildBackendHandler({ ...ctx, fetcher });
+    function withFetcher<TNewResponse>(fetcher: Fetcher<TBody, TNewResponse>) {
+        const { withBodyProvider, withFetcher, ...builder } = backendHandlerBuilder<TRequest, TBody, TNewResponse, TNewResponse>({ ...ctx, fetcher });
         return builder;
     }
 
     function withBodyProvider<TNewBody>(bodyProvider: BodyProvider<TRequest, TNewBody>) {
-        const { withBodyProvider, ...builder } = buildBackendHandler<TRequest, TNewBody, TResponse, TResponseTransformed>({
+        const { withBodyProvider, ...builder } = backendHandlerBuilder<TRequest, TNewBody, TResponse, TResponseTransformed>({
             ...ctx,
             bodyProvider,
             fetcher: defaultFetcher<TNewBody, TResponse>,
@@ -45,15 +45,15 @@ export function buildBackendHandler<TRequest extends EventHandlerRequest, TBody 
     }
 
     function withMethod(method: FetchMethodType) {
-        return buildBackendHandler({ ...ctx, method });
+        return backendHandlerBuilder({ ...ctx, method });
     }
 
     function extendFetchOptions(extender: FetchOptionsExtender<TBody>) {
-        return buildBackendHandler({ ...ctx, extendFetchOptions: async (options) => extender(await ctx.extendFetchOptions(options)) });
+        return backendHandlerBuilder({ ...ctx, extendFetchOptions: async (options) => extender(await ctx.extendFetchOptions(options)) });
     }
 
     function postMap<TMap>(transformer: BackendTransformer<TResponseTransformed, TMap>) {
-        const { withBodyProvider, withFetcher, ...builder } = buildBackendHandler({
+        const { withBodyProvider, withFetcher, ...builder } = backendHandlerBuilder({
             ...ctx, postFetchTransformer: async (x) => transformer(await ctx.postFetchTransformer(x))
         });
 
