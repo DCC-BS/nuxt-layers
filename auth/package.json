@@ -18,5 +18,8 @@
         "nuxt": "^4.2.2",
         "typescript": "^5.9.3",
         "vue": "latest"
+    },
+    "dependencies": {
+        "c12": "^3.3.3"
     }
 }

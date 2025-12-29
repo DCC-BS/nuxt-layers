@@ -1,12 +1,12 @@
 import { createError, defineEventHandler, type EventHandler, type EventHandlerRequest, type H3Event } from "h3";
 import { useRuntimeConfig } from 'nuxt/app';
-import type { FetcherOptions } from '../../../azure-auth/server/models';
-import type { BackendTransformer, BodyProvider, Fetcher, FetchMethodType } from '../types';
+import type { BackendTransformer, BodyProvider, Fetcher, FetchMethodType, FetcherOptions } from '../types';
 import { defaultFetcher, defaultTransformer, getDefaultBodyProvider } from '../types';
 
 type FetchOptionsExtender<TBody> = (options: FetcherOptions<TBody>) => Promise<FetcherOptions<TBody>>;
 
 type BuildContext<TRequest extends EventHandlerRequest, TBody, TResponse, TResponseTransformed> = {
+    url?: string;
     fetcher: Fetcher<TBody, TResponse>;
     bodyProvider: BodyProvider<TRequest, TBody>;
     method: FetchMethodType;
@@ -19,7 +19,6 @@ async function defaultExtendFetchOptions<TBodyTransformed>(options: FetcherOptio
 }
 
 export function buildBackendHandler<TRequest extends EventHandlerRequest, TBody = unknown, TResponse = unknown, TResponseTransformed = TResponse>(
-    url: string,
     context: BuildContext<TRequest, TBody, TResponse, TResponseTransformed> | null = null) {
 
     const ctx = {
@@ -32,31 +31,35 @@ export function buildBackendHandler<TRequest extends EventHandlerRequest, TBody 
     };
 
     function withFetcher(fetcher: Fetcher<TBody, TResponse>) {
-        return buildBackendHandler(url, { ...ctx, fetcher });
+        return buildBackendHandler({ ...ctx, fetcher });
     }
 
     function withBodyProvider(bodyProvider: BodyProvider<TRequest, TBody>) {
-        return buildBackendHandler(url, { ...ctx, bodyProvider });
+        return buildBackendHandler({ ...ctx, bodyProvider });
     }
 
     function withMethod(method: FetchMethodType) {
-        return buildBackendHandler(url, { ...ctx, method });
+        return buildBackendHandler({ ...ctx, method });
     }
 
     function extendFetchOptions(extender: FetchOptionsExtender<TBody>) {
-        return buildBackendHandler(url, { ...ctx, extendFetchOptions: async (options) => extender(await ctx.extendFetchOptions(options)) });
+        return buildBackendHandler({ ...ctx, extendFetchOptions: async (options) => extender(await ctx.extendFetchOptions(options)) });
     }
 
     function postMap<TMap>(transformer: BackendTransformer<TResponseTransformed, TMap>) {
-        return buildBackendHandler(url, {
+        return buildBackendHandler({
             ...ctx, postFetchTransformer: async (x) => transformer(await ctx.postFetchTransformer(x))
         });
     }
 
     function build(): EventHandler<TRequest, Promise<TResponse>> {
         return defineEventHandler<TRequest>(async (event: H3Event) => {
+            if (!ctx.url) {
+                throw new Error("URL is not defined for backend handler");
+            }
+
             try {
-                const { bodyProvider, fetcher, method, postFetchTransformer } = ctx;
+                const { url, bodyProvider, fetcher, method, postFetchTransformer } = ctx;
 
                 // Get runtime configuration for API base URL
                 const config = useRuntimeConfig();
