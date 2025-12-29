@@ -1,1 +1,1 @@
-export default authHandler.build("/pong");
+export default authHandler.withMethod("GET").build("/pong");
