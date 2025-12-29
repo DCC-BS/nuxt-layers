@@ -8,7 +8,7 @@ export type UseAppAuthReturns = {
     signIn: SignIn;
     signOut: SignOut;
     data: Readonly<Ref<AuthData | null>>;
-    isEnabled: Readonly<Ref<boolean>>;
+    isAuthEnabled: Readonly<Ref<boolean>>;
 };
 
 export type UseAppAuth = () => UseAppAuthReturns;

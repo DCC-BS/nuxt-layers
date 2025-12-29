@@ -24,6 +24,6 @@ export function useAppAuth(): UseAppAuthReturns {
         signIn,
         signOut,
         data,
-        isEnabled: computed(() => false),
+        isAuthEnabled: computed(() => false),
     };
 }

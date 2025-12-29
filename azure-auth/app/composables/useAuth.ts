@@ -27,6 +27,6 @@ export function useAppAuth(): UseAppAuthReturns {
         signIn,
         signOut,
         data,
-        isEnabled: computed(() => !!nuxtData.value),
+        isAuthEnabled: computed(() => !!nuxtData.value),
     };
 }
