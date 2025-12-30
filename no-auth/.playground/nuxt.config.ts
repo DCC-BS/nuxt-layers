@@ -1,4 +1,4 @@
 export default defineNuxtConfig({
-  extends: ['../../auth', '..'],
-  modules: ['@nuxt/eslint'],
+    extends: ['../../auth', '..'],
+    modules: ['@nuxt/eslint'],
 })

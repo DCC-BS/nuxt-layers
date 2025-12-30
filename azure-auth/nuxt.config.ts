@@ -1,7 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     devtools: { enabled: true },
-    extends: ["github:DCC-BS/nuxt-layers/backend_communication"],
     modules: [
         '@sidebase/nuxt-auth',
         '@nuxtjs/i18n'

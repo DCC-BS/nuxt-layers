@@ -4,7 +4,11 @@
     "type": "module",
     "private": true,
     "workspaces": [
-        "layers/*"
+        "auth",
+        "no-auth",
+        "azure-auth",
+        "health_check",
+        "backend_communication"
     ],
     "scripts": {
         "create:layer": "bunx create-layer.ts"
