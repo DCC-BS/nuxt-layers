@@ -1,1 +1,10 @@
-{}
+{
+    "auth": {
+        "welcomeBack": "Welcome Back",
+        "signInToContinue": "Sign in to continue to your account",
+        "connecting": "Connecting...",
+        "authenticating": "Authenticating...",
+        "redirecting": "Redirecting...",
+        "azureAdDescription": "We're securely connecting you to Azure Active Directory. This will only take a moment."
+    }
+}

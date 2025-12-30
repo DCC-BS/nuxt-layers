@@ -1,6 +1,6 @@
+import AzureAD from "next-auth/providers/azure-ad";
 import { NuxtAuthHandler } from "#auth";
 import { useRuntimeConfig } from "#imports";
-import AzureAD from "next-auth/providers/azure-ad";
 import type { ExtendedJWT, ExtendedSession } from "../../types/authTypes";
 
 // Helper function to decode JWT without verification (for reading claims)
@@ -60,7 +60,7 @@ export default NuxtAuthHandler({
         signIn: "/auth/signin",
     },
     providers: [
-        // @ts-ignore
+        // @ts-expect-error
         AzureAD.default({
             clientId: useRuntimeConfig().azureAdClientId,
             clientSecret: useRuntimeConfig().azureAdClientSecret,

@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import { useAppAuth } from '#imports';
+import { useAppAuth } from "#imports";
 
 const { data, signOut } = useAppAuth();
-
 </script>
 
 <template>

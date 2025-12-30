@@ -1,5 +1,5 @@
-import type { Ref } from 'vue';
-import type { AuthData } from './authData';
+import type { Ref } from "vue";
+import type { AuthData } from "./authData";
 
 export type SignOut = () => Promise<void>;
 export type SignIn = () => Promise<void>;

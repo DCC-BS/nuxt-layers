@@ -1,5 +1,5 @@
+import { createError, type H3Event } from "h3";
 import { getServerSession, getToken } from "#auth";
-import { type H3Event, createError } from "h3";
 import type { ExtendedJWT, ExtendedSession } from "../types/authTypes";
 
 export async function getAuthContext(event: H3Event) {
@@ -11,10 +11,7 @@ export async function getAuthContext(event: H3Event) {
 
     // Check for session error (token refresh failed)
     // This happens when refresh tokens expire or become invalid
-    if (
-        (session as ExtendedSession)?.error ===
-        "RefreshAccessTokenError"
-    ) {
+    if ((session as ExtendedSession)?.error === "RefreshAccessTokenError") {
         throw createError({
             statusCode: 401,
             statusMessage: "Token Refresh Failed",
@@ -46,6 +43,6 @@ export async function getAuthContext(event: H3Event) {
     return {
         session,
         token,
-        apiAccessToken
-    }
+        apiAccessToken,
+    };
 }

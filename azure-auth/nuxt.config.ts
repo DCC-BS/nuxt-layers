@@ -1,10 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     devtools: { enabled: true },
-    modules: [
-        '@sidebase/nuxt-auth',
-        '@nuxtjs/i18n'
-    ],
+    modules: ["@sidebase/nuxt-auth", "@nuxtjs/i18n"],
     auth: {
         isEnabled: true,
         globalAppMiddleware: true,
@@ -31,7 +28,7 @@ export default defineNuxtConfig({
                 name: "Deutsch",
                 file: "de.json",
             },
-        ]
+        ],
     },
     runtimeConfig: {
         azureAdTenantId: process.env.AZURE_AD_TENANT_ID ?? "NA",
@@ -39,5 +36,5 @@ export default defineNuxtConfig({
         azureAdClientSecret: process.env.AZURE_AD_CLIENT_SECRET ?? "NA",
         azureAdAPIClientId: process.env.AZURE_AD_API_CLIENT_ID ?? "NA",
         authSecret: process.env.AUTH_SECRET ?? "NA",
-    }
-})
+    },
+});

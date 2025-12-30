@@ -1,18 +1,22 @@
-import { useAuth as useNuxtAuth } from '#imports';
-import type { AuthData } from '#layers/auth/app/types/authData';
-import type { UseAppAuthReturns } from '#layers/auth/app/types/composableTypes';
+import { useAuth as useNuxtAuth } from "#imports";
+import type { AuthData } from "#layers/auth/app/types/authData";
+import type { UseAppAuthReturns } from "#layers/auth/app/types/composableTypes";
 
 export function useAppAuth(): UseAppAuthReturns {
-    const { data: nuxtData, signOut: nuxtSignOut, signIn: nuxtSignIn } = useNuxtAuth();
+    const {
+        data: nuxtData,
+        signOut: nuxtSignOut,
+        signIn: nuxtSignIn,
+    } = useNuxtAuth();
 
     const data = computed<AuthData>(() => {
         return {
             user: {
-                image: nuxtData.value?.user?.image || '',
-                name: nuxtData.value?.user?.name || '',
-                email: nuxtData.value?.user?.email || '',
-            }
-        }
+                image: nuxtData.value?.user?.image || "",
+                name: nuxtData.value?.user?.name || "",
+                email: nuxtData.value?.user?.email || "",
+            },
+        };
     });
 
     async function signOut(): Promise<void> {

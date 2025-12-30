@@ -1,5 +1,5 @@
-export const authHandler = backendHandlerBuilder()
-    .extendFetchOptions(async (options) => {
+export const authHandler = backendHandlerBuilder().extendFetchOptions(
+    async (options) => {
         const { apiAccessToken } = await getAuthContext(options.event);
 
         return {
@@ -9,4 +9,5 @@ export const authHandler = backendHandlerBuilder()
                 Authorization: `Bearer ${apiAccessToken}`,
             },
         };
-    });
+    },
+);

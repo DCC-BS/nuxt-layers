@@ -3,8 +3,8 @@ export type User = {
     image: string;
     name: string;
     email: string;
-}
+};
 
 export type AuthData = {
     user: User;
-}
+};

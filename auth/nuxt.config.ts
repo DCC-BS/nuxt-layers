@@ -1,4 +1,4 @@
-import type { SourceOptions } from 'c12';
+import type { SourceOptions } from "c12";
 
 function getExtends() {
     const layers: Array<[string, SourceOptions?]> = [];
@@ -7,14 +7,17 @@ function getExtends() {
         layers.push([process.env.AUTH_LAYER_URI, { install: true }]);
     }
 
-    layers.push(["github:DCC-BS/nuxt-layers/backend_communication", { install: true }]);
+    layers.push([
+        "github:DCC-BS/nuxt-layers/backend_communication",
+        { install: true },
+    ]);
 
     return layers;
 }
 
 export default defineNuxtConfig({
     $meta: {
-        name: 'auth',
+        name: "auth",
     },
     devtools: { enabled: true },
     extends: getExtends(),

@@ -1,1 +1,10 @@
-{}
+{
+    "auth": {
+        "welcomeBack": "Willkommen zurück",
+        "signInToContinue": "Melden Sie sich an, um zu Ihrem Konto zu gelangen",
+        "connecting": "Verbinden...",
+        "authenticating": "Authentifizieren...",
+        "redirecting": "Weiterleiten...",
+        "azureAdDescription": "Wir verbinden Sie sicher mit Azure Active Directory. Das dauert nur einen Moment."
+    }
+}
