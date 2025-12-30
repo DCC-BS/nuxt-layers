@@ -39,5 +39,5 @@ export async function defaultFetcher<TBody, TResponse>(
         body: JSON.stringify(body),
         headers,
         signal: signal,
-    });
+    }) as TResponse;
 }
