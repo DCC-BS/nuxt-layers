@@ -3,6 +3,8 @@ export type User = {
     image: string;
     name: string;
     email: string;
+
+    [key: string]: unknown;
 };
 
 export type AuthData = {
