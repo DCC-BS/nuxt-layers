@@ -22,7 +22,7 @@ export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBod
     const ctx = {
         fetcher: defaultFetcher<TBody, TResponse>,
         bodyProvider: getDefaultBodyProvider<TRequest, TBody>(),
-        method: "POST" as FetchMethodType,
+        method: "GET" as FetchMethodType,
         postFetchTransformer: defaultTransformer as BackendTransformer<TResponse, TResponseTransformed>,
         extendFetchOptions: defaultExtendFetchOptions<TBody>,
         ...context
