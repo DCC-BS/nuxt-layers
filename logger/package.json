@@ -1,0 +1,20 @@
+{
+    "name": "no_auth",
+    "type": "module",
+    "version": "0.0.1",
+    "main": "./nuxt.config.ts",
+    "scripts": {
+        "dev": "nuxi dev .playground",
+        "dev:prepare": "nuxt prepare .playground",
+        "build": "nuxt build .playground",
+        "generate": "nuxt generate .playground",
+        "preview": "nuxt preview .playground"
+    },
+    "devDependencies": {
+        "@types/node": "^24.10.4",
+        "c12": "^3.3.3",
+        "nuxt": "^4.2.2",
+        "typescript": "^5.9.3",
+        "vue": "latest"
+    }
+}
