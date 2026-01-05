@@ -22,7 +22,7 @@ export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBod
     const ctx = {
         fetcher: defaultFetcher<TBody, TResponse>,
         bodyProvider: getDefaultBodyProvider<TRequest, TBody>(),
-        method: "GET" as FetchMethodType,
+        method: "INHERIT" as FetchMethodType,
         postFetchTransformer: defaultTransformer as BackendTransformer<TResponse, TResponseTransformed>,
         extendFetchOptions: defaultExtendFetchOptions<TBody>,
         ...context
@@ -68,7 +68,7 @@ export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBod
         return defineEventHandler<TRequest>(async (event: H3Event) => {
 
             try {
-                const { bodyProvider, fetcher, method, extendFetchOptions, postFetchTransformer } = ctx;
+                const { bodyProvider, fetcher, extendFetchOptions, postFetchTransformer } = ctx;
 
                 // Get runtime configuration for API base URL
                 const config = useRuntimeConfig();
@@ -79,6 +79,9 @@ export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBod
 
                 // Extract request body using the configured body provider
                 const body = await bodyProvider(event);
+                const method = ctx.method === "INHERIT"
+                    ? event.method.toUpperCase() as FetchMethodType
+                    : ctx.method;
 
                 const options = await extendFetchOptions({
                     url: `${config.apiUrl}${url}`,
@@ -101,10 +104,10 @@ export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBod
     }
 
     return {
-        withFetcher,
-        withBodyProvider,
         withMethod,
         extendFetchOptions,
+        withBodyProvider,
+        withFetcher,
         postMap,
         build,
     }
