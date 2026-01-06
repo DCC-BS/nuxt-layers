@@ -1,8 +1,4 @@
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { pino } from "pino";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineNitroPlugin((nitroApp) => {
     // Import the logger function from the utils folder
@@ -10,13 +6,13 @@ export default defineNitroPlugin((nitroApp) => {
         timestamp: true,
         transport: {
             targets: [
-                {
-                    target: "pino-pretty",
-                    level: import.meta.dev ? "trace" : "info",
-                    options: {
-                        colorize: true,
-                    },
-                },
+                // {
+                //     target: "pino-pretty",
+                //     level: import.meta.dev ? "trace" : "info",
+                //     options: {
+                //         colorize: true,
+                //     },
+                // },
                 {
                     target: "pino/file",
                     options: {

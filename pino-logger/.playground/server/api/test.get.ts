@@ -2,7 +2,7 @@ export default defineEventHandler((event) => {
     const logger = getEventLogger(event);
 
     logger.debug("This is a debug");
-    logger.info(
+    logger.error(
         {
             a: 2,
             b: "a string",
