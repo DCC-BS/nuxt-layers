@@ -80,7 +80,7 @@ export class BrowserLogger implements ILogger {
             }
 
             return stackLines.map((line) => line.trim()).join("\n");
-        } catch (e) {
+        } catch (_: unknown) {
             // Fail silently if stack trace capture fails
             return undefined;
         }

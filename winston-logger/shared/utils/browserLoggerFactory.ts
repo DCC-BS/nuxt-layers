@@ -14,7 +14,7 @@ export function getBrowserLogger(name?: string): ILogger {
     if (!loggers[loggername]) {
         // Create a new logger with the specified name in the context
         loggers[loggername] = new BrowserLogger({
-            level: config?.loglevel ?? "info",
+            level: (config?.loglevel as LogLevel) ?? "info",
             defaultContext: config?.meta || [],
             includeStackTrace: config?.includeStackTrace ?? true,
             stackTraceLimit: config?.stackTraceLimit ?? 10,

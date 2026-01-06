@@ -31,7 +31,7 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
 
     // In development mode, log all requests immediately
     if (logAllRequest) {
-        logger.info("Incoming request", requestInfo);
+        logger.info(requestInfo, "Incoming request");
         return;
     }
 
@@ -42,10 +42,13 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
 
         // Log only 4xx and 5xx responses
         if (statusCode >= 400) {
-            logger.error(`Failed request (${statusCode})`, {
-                ...requestInfo,
-                statusCode,
-            });
+            logger.error(
+                {
+                    ...requestInfo,
+                    statusCode,
+                },
+                `Failed request (${statusCode})`,
+            );
         }
     });
 });

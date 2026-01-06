@@ -1,11 +1,12 @@
 import { useNuxtApp } from "#app";
+import type { BaseLogger } from "#layers/logger/shared/types/logger";
 
 /**
  * Composable to access the logger throughout the application
  *
  * @returns The Winston logger instance
  */
-export function useLogger(): ILogger {
+export function useLogger(): BaseLogger {
     // Access the logger from the plugin
     const { $logger } = useNuxtApp();
 
@@ -16,5 +17,5 @@ export function useLogger(): ILogger {
         );
     }
 
-    return $logger as ILogger;
+    return $logger as BaseLogger;
 }

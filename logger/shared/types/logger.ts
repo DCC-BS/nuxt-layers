@@ -1,72 +1,97 @@
-// Define log levels with their priorities
-export const logLevels = {
-    error: 0,
-    warn: 1,
-    info: 2,
-    http: 3,
-    verbose: 4,
-    debug: 5,
-    silly: 6,
-    help: 7,
-    data: 8,
-    prompt: 9,
-    input: 10,
-};
+export type LogLevel =
+    | "silent"
+    | "fatal"
+    | "error"
+    | "warn"
+    | "info"
+    | "debug"
+    | "trace";
 
-export type LogLevel = keyof typeof logLevels;
-
-interface Profiler {
-    logger: ILogger;
-    start: number;
-    done(info?: unknown): boolean;
+export interface LogFn {
+    (msg: string): void;
+    (obj: object, msg?: string): void;
 }
 
-interface LogEntry {
-    level: string;
-    message: string;
-    [optionName: string]: unknown;
-}
+export interface BaseLogger {
+    /**
+     * Set this property to the desired logging level. In order of priority, available levels are:
+     *
+     * - 'fatal'
+     * - 'error'
+     * - 'warn'
+     * - 'info'
+     * - 'debug'
+     * - 'trace'
+     *
+     * The logging level is a __minimum__ level. For instance if `logger.level` is `'info'` then all `'fatal'`, `'error'`, `'warn'`,
+     * and `'info'` logs will be enabled.
+     *
+     * You can pass `'silent'` to disable logging.
+     */
+    level: LogLevel;
 
-interface LeveledLogMethod {
-    (message: string, ...meta: unknown[]): ILogger;
-    (message: string): ILogger;
-    (infoObject: object): ILogger;
-}
-
-interface LogMethod {
-    (level: string, message: string, ...meta: unknown[]): ILogger;
-    (entry: LogEntry): ILogger;
-    (level: string, message: unknown): ILogger;
-}
-
-export interface ILogger {
-    log: LogMethod;
-    clear(): this;
-    close(): this;
-
-    // for cli and npm levels
-    error: LeveledLogMethod;
-    warn: LeveledLogMethod;
-    help: LeveledLogMethod;
-    data: LeveledLogMethod;
-    info: LeveledLogMethod;
-    debug: LeveledLogMethod;
-    prompt: LeveledLogMethod;
-    http: LeveledLogMethod;
-    verbose: LeveledLogMethod;
-    input: LeveledLogMethod;
-    silly: LeveledLogMethod;
-
-    startTimer(): Profiler;
-    profile(id: string | number, meta?: Record<string, unknown>): this;
-
-    child(options: object): this;
-
-    isLevelEnabled(level: string): boolean;
-    isErrorEnabled(): boolean;
-    isWarnEnabled(): boolean;
-    isInfoEnabled(): boolean;
-    isVerboseEnabled(): boolean;
-    isDebugEnabled(): boolean;
-    isSillyEnabled(): boolean;
+    /**
+     * Log at `'fatal'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
+     * If more args follows `msg`, these will be used to format `msg` using `util.format`.
+     *
+     * @typeParam T: the interface of the object being serialized. Default is object.
+     * @param obj: object to be serialized
+     * @param msg: the log message to write
+     * @param ...args: format string values when `msg` is a format string
+     */
+    fatal: LogFn;
+    /**
+     * Log at `'error'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
+     * If more args follows `msg`, these will be used to format `msg` using `util.format`.
+     *
+     * @typeParam T: the interface of the object being serialized. Default is object.
+     * @param obj: object to be serialized
+     * @param msg: the log message to write
+     * @param ...args: format string values when `msg` is a format string
+     */
+    error: LogFn;
+    /**
+     * Log at `'warn'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
+     * If more args follows `msg`, these will be used to format `msg` using `util.format`.
+     *
+     * @typeParam T: the interface of the object being serialized. Default is object.
+     * @param obj: object to be serialized
+     * @param msg: the log message to write
+     * @param ...args: format string values when `msg` is a format string
+     */
+    warn: LogFn;
+    /**
+     * Log at `'info'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
+     * If more args follows `msg`, these will be used to format `msg` using `util.format`.
+     *
+     * @typeParam T: the interface of the object being serialized. Default is object.
+     * @param obj: object to be serialized
+     * @param msg: the log message to write
+     * @param ...args: format string values when `msg` is a format string
+     */
+    info: LogFn;
+    /**
+     * Log at `'debug'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
+     * If more args follows `msg`, these will be used to format `msg` using `util.format`.
+     *
+     * @typeParam T: the interface of the object being serialized. Default is object.
+     * @param obj: object to be serialized
+     * @param msg: the log message to write
+     * @param ...args: format string values when `msg` is a format string
+     */
+    debug: LogFn;
+    /**
+     * Log at `'trace'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
+     * If more args follows `msg`, these will be used to format `msg` using `util.format`.
+     *
+     * @typeParam T: the interface of the object being serialized. Default is object.
+     * @param obj: object to be serialized
+     * @param msg: the log message to write
+     * @param ...args: format string values when `msg` is a format string
+     */
+    trace: LogFn;
+    /**
+     * Noop function.
+     */
+    silent: LogFn;
 }
