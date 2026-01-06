@@ -1,8 +1,3 @@
-import type { LoggerModuleOptions } from "~/src/module";
-import { useRuntimeConfig } from "#imports";
-import { BrowserLogger } from "#layers/logger/shared/BrowserLogger";
-import type { ILogger } from "#layers/logger/shared/ILogger";
-
 // Store loggers by name for reuse
 const loggers: Record<string, BrowserLogger> = {};
 
@@ -14,7 +9,7 @@ const loggers: Record<string, BrowserLogger> = {};
 export function getBrowserLogger(name?: string): ILogger {
     const loggername = name ?? "default";
 
-    const config = useRuntimeConfig().public.logger_bs as LoggerModuleOptions;
+    const config = useAppConfig().logger;
 
     if (!loggers[loggername]) {
         // Create a new logger with the specified name in the context

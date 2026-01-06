@@ -1,5 +1,4 @@
 import { useNuxtApp } from "#app";
-import { ILogger } from "../types/logger";
 
 /**
  * Composable to access the logger throughout the application

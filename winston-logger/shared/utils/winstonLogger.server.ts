@@ -1,7 +1,6 @@
 import path from "node:path";
 import { createLogger, format, transports } from "winston";
 import type * as Transport from "winston-transport";
-import type { ILogger } from "./ILogger";
 const { combine, timestamp, logstash, simple } = format;
 const { Console, File } = transports;
 

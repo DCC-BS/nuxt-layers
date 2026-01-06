@@ -1,3 +1,20 @@
+// Define log levels with their priorities
+export const logLevels = {
+    error: 0,
+    warn: 1,
+    info: 2,
+    http: 3,
+    verbose: 4,
+    debug: 5,
+    silly: 6,
+    help: 7,
+    data: 8,
+    prompt: 9,
+    input: 10,
+};
+
+export type LogLevel = keyof typeof logLevels;
+
 interface Profiler {
     logger: ILogger;
     start: number;

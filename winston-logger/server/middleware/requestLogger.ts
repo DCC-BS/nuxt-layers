@@ -1,6 +1,7 @@
 import type { H3Event } from "h3";
 import { defineEventHandler, getRequestHeader } from "h3";
-import { getEventLogger } from "../utils/eventLogger";
+import { getWinstonLogger } from "../../shared/utils/winstonLogger.server";
+import { getEventLogger } from "../../../logger/server/utils/eventLogger";
 
 const logAllRequest = false;
 
@@ -18,7 +19,7 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
     const userAgent = getRequestHeader(event, "user-agent");
 
     // Get logger instance using the utility function
-    const logger = getWinstonLogger();
+    const logger = getEventLogger(event);
 
     // Create request info object
     const requestInfo = {
