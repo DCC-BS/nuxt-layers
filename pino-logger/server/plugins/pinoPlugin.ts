@@ -1,31 +1,41 @@
-import { pino } from "pino";
+import { pino, type TransportTargetOptions } from "pino";
 
 export default defineNitroPlugin((nitroApp) => {
+    const productionTargets = [
+        {
+            target: "pino/file",
+            level: "warn",
+            options: { destination: 1 },
+        },
+        {
+            target: "pino/file",
+            options: {
+                destination: "./logs/app.log",
+                mkdir: true,
+            },
+            level: "error",
+        },
+    ] as TransportTargetOptions[];
+
+    const devTargets = [
+        {
+            target: "pino-pretty",
+            level: "trace",
+            options: {
+                colorize: false,
+            },
+        },
+    ] as TransportTargetOptions[];
+
     // Import the logger function from the utils folder
     const logger = pino({
+        base: { origin: "api" },
         timestamp: true,
         transport: {
-            targets: [
-                // {
-                //     target: "pino-pretty",
-                //     level: import.meta.dev ? "trace" : "info",
-                //     options: {
-                //         colorize: true,
-                //     },
-                // },
-                {
-                    target: "pino/file",
-                    options: {
-                        destination: "./logs/app.log",
-                        mkdir: true,
-                    },
-                    level: "error",
-                },
-            ],
+            targets: import.meta.dev ? devTargets : productionTargets,
         },
     });
 
-    // Provide the logger to the application
     nitroApp.hooks.hook("error", (error) => {
         logger.error(error, "An error occurred:");
     });
@@ -36,5 +46,5 @@ export default defineNitroPlugin((nitroApp) => {
     });
 
     // Log a message to indicate that the logger is ready
-    logger.info("Winston logger initialized");
+    logger.info("pino logger initialized");
 });

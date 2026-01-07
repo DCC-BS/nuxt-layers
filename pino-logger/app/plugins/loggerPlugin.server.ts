@@ -20,7 +20,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     ] as TransportTargetOptions[];
 
     const logger = pino({
-        base: { from: "server" },
+        base: { origin: "ssr" },
         timestamp: true,
         enabled: true,
         transport: {

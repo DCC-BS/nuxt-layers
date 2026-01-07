@@ -2,8 +2,6 @@ import type { H3Event } from "h3";
 import { defineEventHandler, getRequestHeader } from "h3";
 import { getEventLogger } from "../../../logger/server/utils/eventLogger";
 
-const logAllRequest = false;
-
 /**
  * Server middleware that logs information about incoming requests
  * Logs all requests in development mode, but only failed requests in production
@@ -11,16 +9,14 @@ const logAllRequest = false;
  * @param event - The H3 event object containing request information
  */
 export default defineEventHandler(async (event: H3Event): Promise<void> => {
-    // Extract useful information from the request
     const method = event.node.req.method;
     const url = event.node.req.url;
     const remoteAddress = event.node.req.socket.remoteAddress;
     const userAgent = getRequestHeader(event, "user-agent");
+    const loggerConfig = useAppConfig().logger as LoggerAppConfig;
 
-    // Get logger instance using the utility function
     const logger = getEventLogger(event);
 
-    // Create request info object
     const requestInfo = {
         method,
         url,
@@ -29,14 +25,11 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
         timestamp: new Date().toISOString(),
     };
 
-    // In development mode, log all requests immediately
-    if (logAllRequest) {
+    if (loggerConfig.logAllRequests) {
         logger.info(requestInfo, "Incoming request");
         return;
     }
 
-    // In production, only log failed requests
-    // Add hook to log after the response is processed
     event.node.res.on("finish", () => {
         const statusCode = event.node.res.statusCode;
 

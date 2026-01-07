@@ -2,7 +2,7 @@ import { pino } from "pino";
 
 export default defineNuxtPlugin(async (nuxtApp) => {
     const logger = pino({
-        base: {},
+        base: { origin: "client" },
         timestamp: true,
         transport: {
             targets: [
