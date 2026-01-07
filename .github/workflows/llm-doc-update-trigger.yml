@@ -1,0 +1,21 @@
+name: LLM Doc Update Trigger
+
+on:
+    issue_comment:
+        types: [created]
+
+jobs:
+    llm-doc-update:
+        if: >
+            github.event.issue.pull_request &&
+            github.event.comment.body == '/documentation'
+        uses: DCC-BS/ci-workflows/.github/workflows/llm-doc-update.yml@v7
+        with:
+            doc_repo: DCC-BS/documentation
+            doc_path: "markdown/nuxt-layers"
+            openai_model: GLM-4.7
+            openai_base_url: https://api.z.ai/api/coding/paas/v4
+            pr_number: ${{ format('{0}', github.event.issue.number) }}
+        secrets:
+            OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+            GH_TOKEN: ${{ secrets.GH_TOKEN_CUSTOM }}
