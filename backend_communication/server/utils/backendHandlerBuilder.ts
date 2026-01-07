@@ -1,5 +1,5 @@
 import { createError, defineEventHandler, type EventHandler, type EventHandlerRequest, type H3Event } from "h3";
-import type { BackendTransformer, BodyProvider, Fetcher, FetcherOptions, FetchMethodType } from '../types';
+import type { BackendTransformer, BodyProvider, Fetcher, FetcherOptions, FetchMethodOptionType, FetchMethodType } from '../types';
 import { defaultFetcher, defaultTransformer, getDefaultBodyProvider } from '../types';
 
 type FetchOptionsExtender<TBody> = (options: FetcherOptions<TBody>) => Promise<FetcherOptions<TBody>>;
@@ -79,8 +79,8 @@ export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBod
 
                 // Extract request body using the configured body provider
                 const body = await bodyProvider(event);
-                const method = ctx.method === "INHERIT"
-                    ? event.method.toUpperCase() as FetchMethodType
+                const method: FetchMethodOptionType = ctx.method === "INHERIT"
+                    ? event.method.toUpperCase() as FetchMethodOptionType
                     : ctx.method;
 
                 const options = await extendFetchOptions({

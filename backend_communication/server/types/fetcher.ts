@@ -1,10 +1,11 @@
 import type { H3Event } from "h3";
 
-export type FetchMethodType = "INHERIT" | "GET" | "POST" | "PUT" | "DELETE";
+export type FetchMethodOptionType = "GET" | "POST" | "PUT" | "DELETE";
+export type FetchMethodType = "INHERIT" | FetchMethodOptionType;
 
 export type FetcherOptions<TBody> = {
     url: string;
-    method: FetchMethodType;
+    method: FetchMethodOptionType;
     body: TBody;
     headers: Record<string, string>;
     event: H3Event;

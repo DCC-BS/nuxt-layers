@@ -1,6 +1,5 @@
 import type { H3Event } from "h3";
 import { defineEventHandler, getRequestHeader } from "h3";
-import { getEventLogger } from "../../../logger/server/utils/eventLogger";
 
 /**
  * Server middleware that logs information about incoming requests
