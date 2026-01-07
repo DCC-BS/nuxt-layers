@@ -1,6 +1,6 @@
-import pino from "pino";
-
 export default defineNuxtPlugin(async (nuxtApp) => {
+    const pino = (await import('pino')).default || (await import('pino'));
+
     const loggerConfig = useAppConfig().logger as LoggerAppConfig;
     const logger = pino({
         base: { origin: "client" },
