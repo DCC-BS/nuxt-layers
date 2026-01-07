@@ -1,5 +1,3 @@
-import { useNuxtApp } from "#app";
-
 /**
  * Composable to access the logger throughout the application
  *
@@ -10,7 +8,7 @@ export function useLogger(): BaseLogger {
 
     if (!$logger) {
         throw new Error(
-            "Logger not available. Make sure the winston plugin is properly initialized.",
+            "Logger not available. Make sure the pino-logger plugin is properly initialized.",
         );
     }
 

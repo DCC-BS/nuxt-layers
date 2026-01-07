@@ -1,5 +1,3 @@
-import type { LoggerAppConfig } from "../shared/types/loggerAppConifg";
-
 export default defineAppConfig({
     logger: {
         loglevel: "info" as LogLevel,

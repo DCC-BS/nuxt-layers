@@ -9,7 +9,7 @@ export default defineEventHandler((event) => {
             c: [1, 2, 3],
             d: { msg: "hello world" },
         },
-        "This is a info with an object",
+        "This is a error with an object",
     );
     logger.info("This is a info");
     logger.warn("This is a warning");

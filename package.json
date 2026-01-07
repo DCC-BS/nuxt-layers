@@ -1,5 +1,5 @@
 {
-    "name": "new",
+    "name": "nuxt-layers",
     "module": "index.ts",
     "type": "module",
     "private": true,
