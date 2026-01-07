@@ -1,12 +1,20 @@
-export default defineNuxtPlugin(async (nuxtApp) => {
-    const pino = (await import('pino')).default || (await import('pino'));
+import { pino } from "pino";
 
-    const loggerConfig = useAppConfig().logger as LoggerAppConfig;
+export default defineNuxtPlugin(async (nuxtApp) => {
     const logger = pino({
         base: { origin: "client" },
         timestamp: true,
-        level: loggerConfig.loglevel,
-        browser: { asObject: true }
+        transport: {
+            targets: [
+                {
+                    target: "pino-pretty",
+                    level: import.meta.dev ? "trace" : "info",
+                    options: {
+                        colorize: true,
+                    },
+                },
+            ],
+        },
     });
 
     nuxtApp.provide("logger", logger);
