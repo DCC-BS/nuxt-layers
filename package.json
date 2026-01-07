@@ -1,5 +1,5 @@
 {
-    "name": "nuxt-layers",
+    "name": "new",
     "module": "index.ts",
     "type": "module",
     "private": true,
@@ -11,8 +11,7 @@
         "backend_communication"
     ],
     "scripts": {
-        "create:layer": "bunx create-layer.ts",
-        "check": "bunx biome check"
+        "create:layer": "bunx create-layer.ts"
     },
     "devDependencies": {
         "@types/bun": "latest",
