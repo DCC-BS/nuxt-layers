@@ -1,4 +1,4 @@
-import { pino } from "pino";
+import pino from "pino";
 
 export default defineNuxtPlugin(async (nuxtApp) => {
     const loggerConfig = useAppConfig().logger as LoggerAppConfig;
