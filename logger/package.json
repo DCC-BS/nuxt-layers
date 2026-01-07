@@ -8,7 +8,8 @@
         "dev:prepare": "nuxt prepare .playground",
         "build": "nuxt build .playground",
         "generate": "nuxt generate .playground",
-        "preview": "nuxt preview .playground"
+        "preview": "nuxt preview .playground",
+        "check": "bunx biome check --write"
     },
     "devDependencies": {
         "@types/node": "^24.10.4",

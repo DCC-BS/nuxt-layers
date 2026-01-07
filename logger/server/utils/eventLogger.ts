@@ -1,5 +1,5 @@
-import type { BaseLogger } from "#layers/logger/shared/types/logger";
 import type { H3Event } from "h3";
+import type { BaseLogger } from "#layers/logger/shared/types/logger";
 
 /**
  * Retrieves the logger from the event context or returns a new logger instance

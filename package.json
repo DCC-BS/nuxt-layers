@@ -11,7 +11,8 @@
         "backend_communication"
     ],
     "scripts": {
-        "create:layer": "bunx create-layer.ts"
+        "create:layer": "bunx create-layer.ts",
+        "check": "bunx biome check"
     },
     "devDependencies": {
         "@types/bun": "latest",
