@@ -1,6 +1,8 @@
 import { pino, type TransportTargetOptions } from "pino";
 
 export default defineNuxtPlugin(async (nuxtApp) => {
+    const loggerConfig = useAppConfig().logger as LoggerAppConfig;
+
     const productionTargets = [
         {
             target: "pino/file",
@@ -23,6 +25,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         base: { origin: "ssr" },
         timestamp: true,
         enabled: true,
+        level: loggerConfig.loglevel,
         transport: {
             targets:
                 process.env.NODE_ENV === "production"
