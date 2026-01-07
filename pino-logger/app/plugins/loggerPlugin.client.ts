@@ -1,19 +1,13 @@
-import pino from "pino";
+import * as pinoModule from 'pino'
+
+const pino = pinoModule.default || pinoModule
 
 export default defineNuxtPlugin(async (nuxtApp) => {
     const logger = pino({
         base: { origin: "client" },
         timestamp: true,
-        transport: {
-            targets: [
-                {
-                    target: "pino-pretty",
-                    level: import.meta.dev ? "trace" : "info",
-                    options: {
-                        colorize: true,
-                    },
-                },
-            ],
+        browser: {
+            asObject: true, // recommended in browser.[web:9]
         },
     });
 
