@@ -9,7 +9,7 @@ export type LogLevel =
 
 export interface LogFn {
     (msg: string): void;
-    (obj: object, msg?: string): void;
+    (obj: unknown, msg?: string): void;
 }
 
 export interface BaseLogger {
