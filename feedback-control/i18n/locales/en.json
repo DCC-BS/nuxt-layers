@@ -1,0 +1,27 @@
+{
+    "feedback": {
+        "button": "Feedback",
+        "title": "Share your thoughts",
+        "rating_label": "How would you rate your experience?",
+        "ratings": {
+            "poor": "Poor",
+            "okay": "Okay",
+            "good": "Good",
+            "great": "Great",
+            "excellent": "Excellent"
+        },
+        "message_label": "Tell us what you think",
+        "message_placeholder": "Your feedback helps us get better...",
+        "email_label": "Email",
+        "email_placeholder": "your{'@'}email.com",
+        "email_help": "So we can reach you.",
+        "submit": "Send feedback",
+        "submitting": "Sending...",
+        "success_title": "Thank you for your feedback!",
+        "success_message": "We appreciate your input and will use it to improve our service.",
+        "error_validation": "Please fill in the text field and email address.",
+        "error_submit": "Feedback could not be sent. Please try again later.",
+        "close": "Close",
+        "aria_label": "Give feedback"
+    }
+}
