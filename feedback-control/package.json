@@ -20,12 +20,12 @@
     },
     "type": "module",
     "dependencies": {
-        "motion-v": "^1.7.6",
-        "undici": "^7.18.2",
-        "zod": "^4.3.5"
+        "undici": "^7.18.2"
     },
     "peerDependencies": {
         "@nuxt/ui": "^4.3.0",
-        "@nuxtjs/i18n": "^10.2.1"
+        "@nuxtjs/i18n": "^10.2.1",
+        "motion-v": "^1.7.6",
+        "zod": "^4.3.5"
     }
 }

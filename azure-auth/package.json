@@ -14,10 +14,10 @@
         "@types/node": "^24.10.4",
         "nuxt": "^4.2.2",
         "typescript": "^5.9.3",
-        "vue": "^3.5.26"
+        "vue": "^3.5.26",
+        "@biomejs/biome": "^2.3.10"
     },
     "dependencies": {
-        "@biomejs/biome": "^2.3.10",
         "@sidebase/nuxt-auth": "1.0.0"
     },
     "peerDependencies": {
