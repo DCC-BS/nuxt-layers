@@ -47,7 +47,7 @@ function validateAttachments(): string | null {
     // Check file sizes
     for (const file of attachments.value) {
         if (file.size > MAX_FILE_SIZE) {
-            return t("feedback.error_file_too_large", { maxSize: "500MB", fileName: file.name });
+            return t("feedback.error_file_too_large", { maxSize: "75MB", fileName: file.name });
         }
     }
 
@@ -183,7 +183,7 @@ function blobToBase64(blob: Blob): Promise<string> {
                                         ">
                                     <span class="text-xl leading-none">{{
                                         rating.emoji
-                                    }}</span>
+                                        }}</span>
                                     <span class="text-[0.65rem] whitespace-nowrap text-gray-500 dark:text-gray-400">{{
                                         t(
                                             `feedback.ratings.${rating.value}`,
