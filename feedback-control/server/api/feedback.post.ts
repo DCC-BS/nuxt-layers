@@ -1,7 +1,7 @@
 import { defineEventHandler, readBody } from "h3";
 import { $fetch } from "ofetch";
 import { EnvHttpProxyAgent } from "undici";
-import { FeedbackAttachment } from "../../shared/types/feedbackBody";
+import type { FeedbackAttachment } from "../../shared/types/feedbackBody";
 
 type GhFileUploadResponse = {
     content: {
@@ -9,6 +9,7 @@ type GhFileUploadResponse = {
         path: string;
         url: string;
         download_url: string;
+        html_url: string;
     };
 };
 
@@ -41,7 +42,7 @@ export default defineEventHandler(async (event) => {
             attachments,
         );
 
-        messageWithDetails += `\n\nAttachments:\n`;
+        messageWithDetails += "\n\nAttachments:\n";
         for (const { name, url } of uploadedAttachments) {
             messageWithDetails += `- [${name}](${url})\n`;
         }
@@ -81,8 +82,6 @@ async function uploadAttachments(
 
     const fileUrls = [];
 
-    console.log(githubToken, owner, repo);
-
     for (const attachment of attachments) {
         const ext = attachment.fileName.split(".").pop();
         const newFileName = `${uuid()}.${ext}`;
@@ -109,7 +108,7 @@ async function uploadAttachments(
 
         fileUrls.push({
             name: attachment.fileName,
-            url: response.content.download_url,
+            url: response.content.html_url,
         });
     }
 
@@ -117,12 +116,9 @@ async function uploadAttachments(
 }
 
 function uuid() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-            const r = (Math.random() * 16) | 0,
-                v = c == "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        },
-    );
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
 }

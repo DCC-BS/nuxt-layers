@@ -5,6 +5,7 @@ nuxt.d.ts
 .output
 .data
 .env
+.env.keys
 package-lock.json
 framework
 dist

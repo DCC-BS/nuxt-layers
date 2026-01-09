@@ -15,12 +15,16 @@
         "email_label": "Email",
         "email_placeholder": "your{'@'}email.com",
         "email_help": "So we can reach you.",
+        "attachments_label": "Attachments",
         "submit": "Send feedback",
         "submitting": "Sending...",
         "success_title": "Thank you for your feedback!",
         "success_message": "We appreciate your input and will use it to improve our service.",
         "error_validation": "Please fill in the text field and email address.",
         "error_submit": "Feedback could not be sent. Please try again later.",
+        "error_email_invalid": "Please enter a valid email address.",
+        "error_message_required": "Please tell us what you think.",
+        "error_rating_required": "Please select a rating.",
         "close": "Close",
         "aria_label": "Give feedback"
     }
