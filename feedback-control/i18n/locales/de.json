@@ -1,0 +1,34 @@
+{
+    "feedback": {
+        "button": "Feedback",
+        "title": "Teile deine Gedanken",
+        "rating_label": "Wie würdest du deine Erfahrung bewerten?",
+        "ratings": {
+            "poor": "Schlecht",
+            "okay": "Okay",
+            "good": "Gut",
+            "great": "Sehr gut",
+            "excellent": "Ausgezeichnet"
+        },
+        "message_label": "Sag uns deine Meinung",
+        "message_placeholder": "Dein Feedback hilft uns, besser zu werden...",
+        "email_label": "E-Mail",
+        "email_placeholder": "deine{'@'}email.de",
+        "email_help": "Damit wir dich erreichen können.",
+        "attachments_label": "Anhänge",
+        "attachments_help": "Maximal {maxFiles} Dateien bis zu {maxSize} pro Datei.",
+        "submit": "Feedback senden",
+        "submitting": "Wird gesendet...",
+        "success_title": "Vielen Dank für dein Feedback!",
+        "success_message": "Wir schätzen deine Eingabe und werden sie nutzen, um unseren Service zu verbessern.",
+        "error_validation": "Bitte Textfeld und Mailadresse ausfüllen.",
+        "error_submit": "Feedback konnte nicht gesendet werden. Bitte versuche es später erneut.",
+        "error_email_invalid": "Bitte gib eine gültige E-Mail-Adresse ein.",
+        "error_message_required": "Bitte fülle das Meinungsfeld aus.",
+        "error_rating_required": "Bitte wähle eine Bewertung aus.",
+        "error_too_many_files": "Du kannst maximal {maxFiles} Dateien hochladen.",
+        "error_file_too_large": "Die Datei '{fileName}' ist zu groß. Maximale Größe: {maxSize}.",
+        "close": "Schließen",
+        "aria_label": "Feedback geben"
+    }
+}
