@@ -16,6 +16,7 @@
         "email_placeholder": "deine{'@'}email.de",
         "email_help": "Damit wir dich erreichen können.",
         "attachments_label": "Anhänge",
+        "attachments_help": "Maximal {maxFiles} Dateien bis zu {maxSize} pro Datei.",
         "submit": "Feedback senden",
         "submitting": "Wird gesendet...",
         "success_title": "Vielen Dank für dein Feedback!",
@@ -25,6 +26,8 @@
         "error_email_invalid": "Bitte gib eine gültige E-Mail-Adresse ein.",
         "error_message_required": "Bitte fülle das Meinungsfeld aus.",
         "error_rating_required": "Bitte wähle eine Bewertung aus.",
+        "error_too_many_files": "Du kannst maximal {maxFiles} Dateien hochladen.",
+        "error_file_too_large": "Die Datei '{fileName}' ist zu groß. Maximale Größe: {maxSize}.",
         "close": "Schließen",
         "aria_label": "Feedback geben"
     }

@@ -16,6 +16,7 @@
         "email_placeholder": "your{'@'}email.com",
         "email_help": "So we can reach you.",
         "attachments_label": "Attachments",
+        "attachments_help": "Maximum {maxFiles} files, up to {maxSize} each.",
         "submit": "Send feedback",
         "submitting": "Sending...",
         "success_title": "Thank you for your feedback!",
@@ -25,6 +26,8 @@
         "error_email_invalid": "Please enter a valid email address.",
         "error_message_required": "Please tell us what you think.",
         "error_rating_required": "Please select a rating.",
+        "error_too_many_files": "You can upload a maximum of {maxFiles} files.",
+        "error_file_too_large": "The file '{fileName}' is too large. Maximum size: {maxSize}.",
         "close": "Close",
         "aria_label": "Give feedback"
     }

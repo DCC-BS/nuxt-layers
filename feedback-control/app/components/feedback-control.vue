@@ -19,6 +19,10 @@ const isSubmitted = ref(false);
 const errorMessage = ref("");
 const attachments = ref<File[]>([]);
 
+// Constants for attachment validation
+const MAX_FILES = 2;
+const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB in bytes
+
 const ratings = [
     { emoji: "😕", value: "poor" },
     { emoji: "😐", value: "okay" },
@@ -27,9 +31,39 @@ const ratings = [
     { emoji: "🤩", value: "excellent" },
 ];
 
+// Watch attachments to enforce max file limit
+watch(attachments, (newFiles) => {
+    if (newFiles.length > MAX_FILES) {
+        attachments.value = newFiles.slice(0, MAX_FILES);
+    }
+}, { deep: true });
+
+function validateAttachments(): string | null {
+    // Check file count
+    if (attachments.value.length > MAX_FILES) {
+        return t("feedback.error_too_many_files", { maxFiles: MAX_FILES });
+    }
+
+    // Check file sizes
+    for (const file of attachments.value) {
+        if (file.size > MAX_FILE_SIZE) {
+            return t("feedback.error_file_too_large", { maxSize: "500MB", fileName: file.name });
+        }
+    }
+
+    return null;
+}
+
 async function submitFeedback() {
     // Clear any previous error
     errorMessage.value = "";
+
+    // Validate attachments
+    const attachmentError = validateAttachments();
+    if (attachmentError) {
+        errorMessage.value = attachmentError;
+        return;
+    }
 
     // Validate form using Zod schema
     const validationResult = bodySchema.safeParse({
@@ -180,6 +214,8 @@ function blobToBase64(blob: Blob): Promise<string> {
                                 class="text-sm font-medium text-gray-500 dark:text-gray-400">{{
                                     t("feedback.attachments_label") }}</label>
                             <UFileUpload v-model="attachments" multiple layout="list" class="min-h-48" />
+                            <small class="text-[0.65rem] text-gray-500 dark:text-gray-400 inline-block mt-1">{{
+                                t("feedback.attachments_help", { maxFiles: MAX_FILES, maxSize: "500MB" }) }}</small>
                         </div>
 
                         <motion.div v-if="errorMessage" :initial="{ opacity: 0, x: -10 }"
