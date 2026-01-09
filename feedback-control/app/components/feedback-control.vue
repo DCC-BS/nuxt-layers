@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { motion, AnimatePresence } from "motion-v";
+import { motion } from "motion-v";
 
 interface InputProps {
     defaultMail?: string;
@@ -27,7 +27,7 @@ const ratings = [
     { emoji: "🤩", value: "excellent" },
 ];
 
-const submitFeedback = async () => {
+async function submitFeedback() {
     // Clear any previous error
     errorMessage.value = "";
 
@@ -56,8 +56,7 @@ const submitFeedback = async () => {
 
     isSubmitting.value = true;
     const base64Attachments = await Promise.all(
-        attachments.value.map(async a =>
-            ({ base64: await blobToBase64(a), fileName: a.name } as FeedbackAttachment)));
+        attachments.value.map(async (a) => ({ base64: await blobToBase64(a), fileName: a.name } as FeedbackAttachment)));
 
     try {
         await $fetch("/api/feedback", {
@@ -78,25 +77,23 @@ const submitFeedback = async () => {
 
         // Reset after a few seconds
         setTimeout(() => {
-            feedbackText.value = "";
-            selectedRating.value = "";
-            emailAddress.value = "";
-            isSubmitted.value = false;
+            resetForm();
         }, 3000);
     } catch (error) {
         isSubmitting.value = false;
         errorMessage.value = t("feedback.error_submit");
         console.error("Failed to submit feedback:", error);
     }
-};
+}
 
-const resetForm = () => {
+function resetForm() {
     feedbackText.value = "";
     selectedRating.value = "";
     emailAddress.value = "";
     isSubmitted.value = false;
     errorMessage.value = "";
-};
+    attachments.value = [];
+}
 
 function blobToBase64(blob: Blob): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -152,7 +149,7 @@ function blobToBase64(blob: Blob): Promise<string> {
                                         ">
                                     <span class="text-xl leading-none">{{
                                         rating.emoji
-                                        }}</span>
+                                    }}</span>
                                     <span class="text-[0.65rem] whitespace-nowrap text-gray-500 dark:text-gray-400">{{
                                         t(
                                             `feedback.ratings.${rating.value}`,
