@@ -1,6 +1,6 @@
 export default defineAppConfig({
     logger: {
-        loglevel: "info" as LogLevel,
+        loglevel: "trace" as LogLevel,
         meta: [] as unknown[],
         includeStackTrace: false,
         stackTraceLimit: 5,

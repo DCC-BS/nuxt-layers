@@ -1,6 +1,8 @@
 import { pino, type TransportTargetOptions } from "pino";
 
 export default defineNitroPlugin((nitroApp) => {
+    const loggerConfig = useAppConfig().logger as LoggerAppConfig;
+
     const productionTargets = [
         {
             target: "pino/file",
@@ -22,6 +24,7 @@ export default defineNitroPlugin((nitroApp) => {
     // Import the logger function from the utils folder
     const logger = pino({
         base: { origin: "api" },
+        level: loggerConfig.loglevel,
         timestamp: true,
         transport: {
             targets: import.meta.dev ? devTargets : productionTargets,

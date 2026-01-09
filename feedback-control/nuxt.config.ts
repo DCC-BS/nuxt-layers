@@ -1,5 +1,16 @@
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
+
+const currentDir = dirname(fileURLToPath(import.meta.url))
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    $meta: {
+        name: "feedback-control",
+    },
+    css: [
+        join(currentDir, './app/assets/main.css'),
+    ],
     devtools: { enabled: true },
     modules: ["@nuxt/ui", "@nuxtjs/i18n"],
     runtimeConfig: {

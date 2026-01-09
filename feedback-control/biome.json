@@ -7,7 +7,12 @@
     },
     "files": {
         "ignoreUnknown": false,
-        "includes": ["**", "!.nuxt", "!.output", "!logs"]
+        "includes": [
+            "**",
+            "!.nuxt",
+            "!.output",
+            "!logs"
+        ]
     },
     "formatter": {
         "enabled": true,
@@ -44,9 +49,16 @@
             "quoteStyle": "double"
         }
     },
+    "css": {
+        "parser": {
+            "tailwindDirectives": true
+        }
+    },
     "overrides": [
         {
-            "includes": ["**/*.vue"],
+            "includes": [
+                "**/*.vue"
+            ],
             "linter": {
                 "rules": {
                     "correctness": {
