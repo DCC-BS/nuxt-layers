@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
     const githubToken = config.githubToken;
     const repo = config.repo;
-    const owner = config.owner;
+    const owner = config.repoOwner;
     const project = config.project;
 
     let messageWithDetails = "";
