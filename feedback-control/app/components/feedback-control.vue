@@ -149,7 +149,7 @@ function blobToBase64(blob: Blob): Promise<string> {
                                         ">
                                     <span class="text-xl leading-none">{{
                                         rating.emoji
-                                    }}</span>
+                                        }}</span>
                                     <span class="text-[0.65rem] whitespace-nowrap text-gray-500 dark:text-gray-400">{{
                                         t(
                                             `feedback.ratings.${rating.value}`,

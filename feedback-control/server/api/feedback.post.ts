@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
         messageWithDetails += `\n\nContact Email: ${email}`;
     }
 
-    if (attachments) {
+    if (attachments && attachments.length > 0) {
         const uploadedAttachments = await uploadAttachments(
             owner,
             repo,
