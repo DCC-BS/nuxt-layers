@@ -21,7 +21,7 @@ const attachments = ref<File[]>([]);
 
 // Constants for attachment validation
 const MAX_FILES = 2;
-const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB in bytes
+const MAX_FILE_SIZE = 75 * 1024 * 1024; // 500MB in bytes
 
 const ratings = [
     { emoji: "😕", value: "poor" },
@@ -123,7 +123,7 @@ async function submitFeedback() {
 function resetForm() {
     feedbackText.value = "";
     selectedRating.value = "";
-    emailAddress.value = "";
+    emailAddress.value = props.defaultMail;
     isSubmitted.value = false;
     errorMessage.value = "";
     attachments.value = [];
@@ -183,7 +183,7 @@ function blobToBase64(blob: Blob): Promise<string> {
                                         ">
                                     <span class="text-xl leading-none">{{
                                         rating.emoji
-                                        }}</span>
+                                    }}</span>
                                     <span class="text-[0.65rem] whitespace-nowrap text-gray-500 dark:text-gray-400">{{
                                         t(
                                             `feedback.ratings.${rating.value}`,
