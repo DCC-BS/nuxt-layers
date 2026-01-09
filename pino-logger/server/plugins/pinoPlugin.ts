@@ -7,14 +7,6 @@ export default defineNitroPlugin((nitroApp) => {
             level: "warn",
             options: { destination: 1 },
         },
-        {
-            target: "pino/file",
-            options: {
-                destination: "./logs/app.log",
-                mkdir: true,
-            },
-            level: "error",
-        },
     ] as TransportTargetOptions[];
 
     const devTargets = [
