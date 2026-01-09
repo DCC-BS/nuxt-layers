@@ -3,10 +3,13 @@ import { motion } from "motion-v";
 
 interface InputProps {
     defaultMail?: string;
+    /** When true, removes fixed positioning so the component can be placed inline with other elements (e.g., in a footer) */
+    inline?: boolean;
 }
 
 const props = withDefaults(defineProps<InputProps>(), {
     defaultMail: "",
+    inline: false,
 });
 
 const { t } = useI18n();
@@ -144,7 +147,7 @@ function blobToBase64(blob: Blob): Promise<string> {
 </script>
 
 <template>
-    <div id="feedback-control" class="fixed bottom-4 right-4 z-9999">
+    <div id="feedback-control" :class="inline ? '' : 'fixed bottom-4 right-4 z-9999'">
         <UPopover>
             <template #default="{ open }">
                 <UButton color="secondary" :aria-label="t('feedback.aria_label')" icon="i-lucide-message-square">
