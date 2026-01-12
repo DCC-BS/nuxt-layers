@@ -9,4 +9,14 @@ export default defineNuxtConfig({
             include: ["pino"],
         },
     },
+    runtimeConfig: {
+        public: {
+            logger: {
+                loglevel: (import.meta.dev ? "debug" : "warn") as LogLevel,
+                includeStackTrace: true,
+                stackTraceLimit: 5,
+                logAllRequests: false,
+            },
+        },
+    },
 });

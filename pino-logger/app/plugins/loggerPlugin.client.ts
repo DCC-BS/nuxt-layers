@@ -1,7 +1,7 @@
 import pino from "pino";
 
 export default defineNuxtPlugin(async (nuxtApp) => {
-    const loggerConfig = useAppConfig().logger as LoggerAppConfig;
+    const loggerConfig = useRuntimeConfig().public.logger;
 
     const logger = pino({
         base: { origin: "client" },

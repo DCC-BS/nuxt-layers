@@ -23,6 +23,14 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .env.local
 .env.keys
 
+# ignore env files in subfolders
+**/.env
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+**/.env.local
+**/.env.keys
+
 # caches
 .eslintcache
 .cache

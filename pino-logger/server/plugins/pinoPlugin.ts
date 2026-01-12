@@ -1,12 +1,11 @@
 import { pino, type TransportTargetOptions } from "pino";
 
 export default defineNitroPlugin((nitroApp) => {
-    const loggerConfig = useAppConfig().logger as LoggerAppConfig;
+    const loggerConfig = useRuntimeConfig().public.logger;
 
     const productionTargets = [
         {
             target: "pino/file",
-            level: "warn",
             options: { destination: 1 },
         },
     ] as TransportTargetOptions[];
@@ -14,7 +13,6 @@ export default defineNitroPlugin((nitroApp) => {
     const devTargets = [
         {
             target: "pino-pretty",
-            level: "trace",
             options: {
                 colorize: false,
             },
