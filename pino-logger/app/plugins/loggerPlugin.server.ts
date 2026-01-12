@@ -1,7 +1,7 @@
 import { pino, type TransportTargetOptions } from "pino";
 
 export default defineNuxtPlugin(async (nuxtApp) => {
-    const loggerConfig = useAppConfig().logger as LoggerAppConfig;
+    const loggerConfig = useRuntimeConfig().logger;
 
     const productionTargets = [
         {

@@ -55,16 +55,15 @@ async function getApiAccessToken(refreshToken: unknown) {
 }
 
 export default NuxtAuthHandler({
-    secret: useRuntimeConfig().authSecret,
+    secret: useRuntimeConfig().auth.authSecret,
     pages: {
         signIn: "/auth/signin",
     },
     providers: [
-        // @ts-expect-error
         AzureAD.default({
-            clientId: useRuntimeConfig().azureAdClientId,
-            clientSecret: useRuntimeConfig().azureAdClientSecret,
-            tenantId: useRuntimeConfig().azureAdTenantId,
+            clientId: useRuntimeConfig().auth.azureAdClientId,
+            clientSecret: useRuntimeConfig().auth.azureAdClientSecret,
+            tenantId: useRuntimeConfig().auth.azureAdTenantId,
             authorization: {
                 params: {
                     scope: "openid profile email offline_access User.Read",

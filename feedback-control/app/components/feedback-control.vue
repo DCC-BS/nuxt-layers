@@ -35,11 +35,15 @@ const ratings = [
 ];
 
 // Watch attachments to enforce max file limit
-watch(attachments, (newFiles) => {
-    if (newFiles.length > MAX_FILES) {
-        attachments.value = newFiles.slice(0, MAX_FILES);
-    }
-}, { deep: true });
+watch(
+    attachments,
+    (newFiles) => {
+        if (newFiles.length > MAX_FILES) {
+            attachments.value = newFiles.slice(0, MAX_FILES);
+        }
+    },
+    { deep: true },
+);
 
 function validateAttachments(): string | null {
     // Check file count
@@ -50,7 +54,10 @@ function validateAttachments(): string | null {
     // Check file sizes
     for (const file of attachments.value) {
         if (file.size > MAX_FILE_SIZE) {
-            return t("feedback.error_file_too_large", { maxSize: "75MB", fileName: file.name });
+            return t("feedback.error_file_too_large", {
+                maxSize: "75MB",
+                fileName: file.name,
+            });
         }
     }
 
@@ -93,7 +100,14 @@ async function submitFeedback() {
 
     isSubmitting.value = true;
     const base64Attachments = await Promise.all(
-        attachments.value.map(async (a) => ({ base64: await blobToBase64(a), fileName: a.name } as FeedbackAttachment)));
+        attachments.value.map(
+            async (a) =>
+                ({
+                    base64: await blobToBase64(a),
+                    fileName: a.name,
+                }) as FeedbackAttachment,
+        ),
+    );
 
     try {
         await $fetch("/api/feedback", {
