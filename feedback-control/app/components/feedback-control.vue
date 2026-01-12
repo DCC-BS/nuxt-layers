@@ -24,7 +24,8 @@ const attachments = ref<File[]>([]);
 
 // Constants for attachment validation
 const MAX_FILES = 2;
-const MAX_FILE_SIZE = 75 * 1024 * 1024; // 75MB in bytes
+const MAX_FILE_SIZE_MB = 75;
+const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024; // 75MB in bytes
 
 const ratings = [
     { emoji: "😕", value: "poor" },
@@ -55,7 +56,7 @@ function validateAttachments(): string | null {
     for (const file of attachments.value) {
         if (file.size > MAX_FILE_SIZE) {
             return t("feedback.error_file_too_large", {
-                maxSize: "75MB",
+                maxSize: `${MAX_FILE_SIZE_MB}MB`,
                 fileName: file.name,
             });
         }
@@ -291,7 +292,7 @@ function blobToBase64(blob: Blob): Promise<string> {
                                 >{{
                                     t("feedback.attachments_help", {
                                         maxFiles: MAX_FILES,
-                                        maxSize: "500MB",
+                                        maxSize: `${MAX_FILE_SIZE_MB}MB`,
                                     })
                                 }}</small
                             >
