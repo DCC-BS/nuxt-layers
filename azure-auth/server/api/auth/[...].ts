@@ -30,7 +30,7 @@ function decodeJWT(token: string) {
 }
 
 async function getApiAccessToken(refreshToken: unknown) {
-    const config = useRuntimeConfig();
+    const config = useRuntimeConfig().auth;
     const url = `https://login.microsoftonline.com/${config.azureAdTenantId}/oauth2/v2.0/token`;
     const body = new URLSearchParams({
         grant_type: "refresh_token",

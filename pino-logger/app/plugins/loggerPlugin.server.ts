@@ -1,12 +1,11 @@
 import { pino, type TransportTargetOptions } from "pino";
 
 export default defineNuxtPlugin(async (nuxtApp) => {
-    const loggerConfig = useRuntimeConfig().logger;
+    const loggerConfig = useRuntimeConfig().public.logger;
 
     const productionTargets = [
         {
             target: "pino/file",
-            level: "warn",
             options: { destination: 1 },
         },
     ] as TransportTargetOptions[];

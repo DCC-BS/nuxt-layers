@@ -12,7 +12,7 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
     const url = event.node.req.url;
     const remoteAddress = event.node.req.socket.remoteAddress;
     const userAgent = getRequestHeader(event, "user-agent");
-    const loggerConfig = useRuntimeConfig().logger;
+    const loggerConfig = useRuntimeConfig().public.logger;
 
     const logger = getEventLogger(event);
 

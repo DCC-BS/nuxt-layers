@@ -1,5 +1,5 @@
 export default defineNitroPlugin(() => {
-    const config = useRuntimeConfig();
+    const config = useRuntimeConfig().feedback;
 
     const githubToken = config.githubToken ?? process.env.GITHUB_TOKEN;
     const repo = config.repo;
