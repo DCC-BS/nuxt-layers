@@ -1,12 +1,12 @@
 import { createError, defineEventHandler, type EventHandler, type EventHandlerRequest, type H3Event } from "h3";
 import type { BackendTransformer, BodyProvider, Fetcher, FetcherOptions, FetchMethodOptionType, FetchMethodType } from '../types';
-import { defaultFetcher, defaultTransformer, getDefaultBodyProvider } from '../types';
+import { defaultFetcher, defaultTransformer, getDefaultBodyProvider } from "../types";
 
 type FetchOptionsExtender<TBody> = (options: FetcherOptions<TBody>) => Promise<FetcherOptions<TBody>>;
 
 type BuildContext<TRequest extends EventHandlerRequest, TBody, TResponse, TResponseTransformed> = {
     fetcher: Fetcher<TBody, TResponse>;
-    bodyProvider: BodyProvider<TRequest, TBody>;
+    bodyProvider: BodyProvider<TRequest, TBody> | undefined;
     method: FetchMethodType;
     postFetchTransformer: BackendTransformer<TResponse, TResponseTransformed>;
     extendFetchOptions: FetchOptionsExtender<TBody>,
@@ -21,11 +21,11 @@ export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBod
 
     const ctx = {
         fetcher: defaultFetcher<TBody, TResponse>,
-        bodyProvider: getDefaultBodyProvider<TRequest, TBody>(),
+        bodyProvider: undefined as BodyProvider<TRequest, TBody> | undefined,
         method: "INHERIT" as FetchMethodType,
         postFetchTransformer: defaultTransformer as BackendTransformer<TResponse, TResponseTransformed>,
         extendFetchOptions: defaultExtendFetchOptions<TBody>,
-        ...context
+        ...context ?? {}
     };
 
     function withFetcher<TNewResponse>(fetcher: Fetcher<TBody, TNewResponse>) {
@@ -77,12 +77,17 @@ export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBod
                     throw new Error("API URL is not configured in runtime config. Set the env variable API_URL.");
                 }
 
-                // Extract request body using the configured body provider
-                const body = await bodyProvider(event);
                 const method: FetchMethodOptionType = ctx.method === "INHERIT"
                     ? event.method.toUpperCase() as FetchMethodOptionType
                     : ctx.method;
 
+                // Extract request body using the configured body provider
+                let bodyProviderOrDefault = bodyProvider;
+                if (!bodyProviderOrDefault) {
+                    bodyProviderOrDefault = getDefaultBodyProvider(method);
+                }
+
+                const body = await bodyProviderOrDefault(event);
                 const options = await extendFetchOptions({
                     url: `${config.apiUrl}${url}`,
                     method,

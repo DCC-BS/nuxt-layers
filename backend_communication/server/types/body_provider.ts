@@ -33,10 +33,8 @@ export async function noBody<TRequest extends EventHandlerRequest>(
 export function getDefaultBodyProvider<
     TRequest extends EventHandlerRequest,
     TBody,
->(method?: "GET" | "POST" | "PUT" | "DELETE"): BodyProvider<TRequest, TBody> {
+>(method: "GET" | "POST" | "PUT" | "DELETE"): BodyProvider<TRequest, TBody> {
     switch (method) {
-        case undefined:
-            return noBody as BodyProvider<TRequest, TBody>;
         case "GET":
         case "DELETE":
             return noBody as BodyProvider<TRequest, TBody>;
