@@ -12,7 +12,9 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             logger: {
-                loglevel: (import.meta.dev ? "debug" : "warn") as LogLevel,
+                loglevel: (process.env.NODE_ENV === "production"
+                    ? "warn"
+                    : "debug") as LogLevel,
                 includeStackTrace: true,
                 stackTraceLimit: 5,
                 logAllRequests: false,
