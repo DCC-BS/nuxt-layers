@@ -1,7 +1,7 @@
 import { createError, defineEventHandler, type EventHandler, type EventHandlerRequest, type H3Event, } from "h3";
-import type { BackendTransformer, BodyProvider, Fetcher, FetcherOptions, FetchMethodOptionType, FetchMethodType,: w } from "../types";
+import type { BackendTransformer, BodyProvider, Fetcher, FetcherOptions, FetchMethodOptionType, FetchMethodType } from "../types";
 import { defaultFetcher, defaultTransformer, getDefaultBodyProvider, } from "../types";
-import { createDummyFetcher, defaultDummyFetcher, type DummyFetcherData, } from "../types/dummy_fetcher";
+import { createDummyFetcher, type DummyFetcherData, defaultDummyFetcher, } from "../types/dummy_fetcher";
 
 type FetchOptionsExtender<TBody> = (
     options: FetcherOptions<TBody>,
@@ -15,7 +15,7 @@ type BuildContext<
 > = {
     fetcher: Fetcher<TBody, TResponse>;
     dummyFetcher: Fetcher<TBody, TResponse>;
-    bodyProvider: BodyProvider<TRequest, TBody>;
+    bodyProvider: BodyProvider<TRequest, TBody> | undefined;
     method: FetchMethodType;
     postFetchTransformer: BackendTransformer<TResponse, TResponseTransformed>;
     extendFetchOptions: FetchOptionsExtender<TBody>;
@@ -56,10 +56,7 @@ export function backendHandlerBuilder<
                 ...ctx,
                 fetcher,
                 dummyFetcher: defaultDummyFetcher<TBody, TNewResponse>(),
-                postFetchTransformer: defaultTransformer as BackendTransformer<
-                    TNewResponse,
-                    TNewResponse
-                >,
+                postFetchTransformer: defaultTransformer as BackendTransformer<TNewResponse, TNewResponse>,
             });
         return builder;
     }
@@ -69,10 +66,7 @@ export function backendHandlerBuilder<
             backendHandlerBuilder<TRequest, TBody, TResponse, TResponse>({
                 ...ctx,
                 dummyFetcher: createDummyFetcher<TBody, TResponse>(dummyData),
-                postFetchTransformer: defaultTransformer as BackendTransformer<
-                    TResponse,
-                    TResponse
-                >,
+                postFetchTransformer: defaultTransformer as BackendTransformer<TResponse, TResponse>,
             });
         return builder;
     }
