@@ -7,5 +7,6 @@ export default defineNuxtConfig({
     devtools: { enabled: true },
     runtimeConfig: {
         apiUrl: process.env.API_URL,
-    }
-})
+        useDummyData: process.env.DUMMY || "",
+    },
+});

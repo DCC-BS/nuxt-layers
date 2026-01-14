@@ -1,48 +1,97 @@
-import { createError, defineEventHandler, type EventHandler, type EventHandlerRequest, type H3Event } from "h3";
-import type { BackendTransformer, BodyProvider, Fetcher, FetcherOptions, FetchMethodOptionType, FetchMethodType } from '../types';
-import { defaultFetcher, defaultTransformer, getDefaultBodyProvider } from '../types';
+import { createError, defineEventHandler, type EventHandler, type EventHandlerRequest, type H3Event, } from "h3";
+import type { BackendTransformer, BodyProvider, Fetcher, FetcherOptions, FetchMethodOptionType, FetchMethodType,: w } from "../types";
+import { defaultFetcher, defaultTransformer, getDefaultBodyProvider, } from "../types";
+import { createDummyFetcher, defaultDummyFetcher, type DummyFetcherData, } from "../types/dummy_fetcher";
 
-type FetchOptionsExtender<TBody> = (options: FetcherOptions<TBody>) => Promise<FetcherOptions<TBody>>;
+type FetchOptionsExtender<TBody> = (
+    options: FetcherOptions<TBody>,
+) => Promise<FetcherOptions<TBody>>;
 
-type BuildContext<TRequest extends EventHandlerRequest, TBody, TResponse, TResponseTransformed> = {
+type BuildContext<
+    TRequest extends EventHandlerRequest,
+    TBody,
+    TResponse,
+    TResponseTransformed,
+> = {
     fetcher: Fetcher<TBody, TResponse>;
+    dummyFetcher: Fetcher<TBody, TResponse>;
     bodyProvider: BodyProvider<TRequest, TBody>;
     method: FetchMethodType;
     postFetchTransformer: BackendTransformer<TResponse, TResponseTransformed>;
-    extendFetchOptions: FetchOptionsExtender<TBody>,
-}
+    extendFetchOptions: FetchOptionsExtender<TBody>;
+};
 
-async function defaultExtendFetchOptions<TBody>(options: FetcherOptions<TBody>) {
+async function defaultExtendFetchOptions<TBody>(
+    options: FetcherOptions<TBody>,
+) {
     return options;
 }
 
-export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBody = unknown, TResponse = unknown, TResponseTransformed = TResponse>(
-    context: BuildContext<TRequest, TBody, TResponse, TResponseTransformed> | undefined = undefined) {
-
+export function backendHandlerBuilder<
+    TRequest extends EventHandlerRequest,
+    TBody = unknown,
+    TResponse = unknown,
+    TResponseTransformed = TResponse,
+>(
+    context:
+        | BuildContext<TRequest, TBody, TResponse, TResponseTransformed>
+        | undefined = undefined,
+) {
     const ctx = {
         fetcher: defaultFetcher<TBody, TResponse>,
+        dummyFetcher: defaultDummyFetcher<TBody, TResponse>(),
         bodyProvider: getDefaultBodyProvider<TRequest, TBody>(),
         method: "INHERIT" as FetchMethodType,
-        postFetchTransformer: defaultTransformer as BackendTransformer<TResponse, TResponseTransformed>,
+        postFetchTransformer: defaultTransformer as BackendTransformer<
+            TResponse,
+            TResponseTransformed
+        >,
         extendFetchOptions: defaultExtendFetchOptions<TBody>,
-        ...context
+        ...context,
     };
 
     function withFetcher<TNewResponse>(fetcher: Fetcher<TBody, TNewResponse>) {
-        const { withBodyProvider, withFetcher, ...builder } = backendHandlerBuilder<TRequest, TBody, TNewResponse, TNewResponse>({
-            ...ctx,
-            fetcher,
-            postFetchTransformer: defaultTransformer as BackendTransformer<TNewResponse, TNewResponse>
-        });
+        const { withBodyProvider, withFetcher, ...builder } =
+            backendHandlerBuilder<TRequest, TBody, TNewResponse, TNewResponse>({
+                ...ctx,
+                fetcher,
+                dummyFetcher: defaultDummyFetcher<TBody, TNewResponse>(),
+                postFetchTransformer: defaultTransformer as BackendTransformer<
+                    TNewResponse,
+                    TNewResponse
+                >,
+            });
         return builder;
     }
 
-    function withBodyProvider<TNewBody>(bodyProvider: BodyProvider<TRequest, TNewBody>) {
-        const { withBodyProvider, ...builder } = backendHandlerBuilder<TRequest, TNewBody, TResponse, TResponseTransformed>({
+    function withDummyFetcher(dummyData: DummyFetcherData<TBody, TResponse>) {
+        const { withBodyProvider, withFetcher, withDummyFetcher, ...builder } =
+            backendHandlerBuilder<TRequest, TBody, TResponse, TResponse>({
+                ...ctx,
+                dummyFetcher: createDummyFetcher<TBody, TResponse>(dummyData),
+                postFetchTransformer: defaultTransformer as BackendTransformer<
+                    TResponse,
+                    TResponse
+                >,
+            });
+        return builder;
+    }
+
+    function withBodyProvider<TNewBody>(
+        bodyProvider: BodyProvider<TRequest, TNewBody>,
+    ) {
+        const { withBodyProvider, ...builder } = backendHandlerBuilder<
+            TRequest,
+            TNewBody,
+            TResponse,
+            TResponseTransformed
+        >({
             ...ctx,
             bodyProvider,
             fetcher: defaultFetcher<TNewBody, TResponse>,
-            extendFetchOptions: ctx.extendFetchOptions as unknown as FetchOptionsExtender<TNewBody>,
+            dummyFetcher: defaultDummyFetcher<TNewBody, TResponse>(),
+            extendFetchOptions:
+                ctx.extendFetchOptions as unknown as FetchOptionsExtender<TNewBody>,
         });
 
         return builder;
@@ -53,35 +102,52 @@ export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBod
     }
 
     function extendFetchOptions(extender: FetchOptionsExtender<TBody>) {
-        return backendHandlerBuilder({ ...ctx, extendFetchOptions: async (options) => extender(await ctx.extendFetchOptions(options)) });
+        return backendHandlerBuilder({
+            ...ctx,
+            extendFetchOptions: async (options) =>
+                extender(await ctx.extendFetchOptions(options)),
+        });
     }
 
-    function postMap<TMap>(transformer: BackendTransformer<TResponseTransformed, TMap>) {
-        const { withBodyProvider, withFetcher, ...builder } = backendHandlerBuilder({
-            ...ctx, postFetchTransformer: async (x) => transformer(await ctx.postFetchTransformer(x))
-        });
+    function postMap<TMap>(
+        transformer: BackendTransformer<TResponseTransformed, TMap>,
+    ) {
+        const { withBodyProvider, withFetcher, ...builder } =
+            backendHandlerBuilder({
+                ...ctx,
+                postFetchTransformer: async (x) =>
+                    transformer(await ctx.postFetchTransformer(x)),
+            });
 
         return builder;
     }
 
     function build(url: string): EventHandler<TRequest, Promise<TResponse>> {
         return defineEventHandler<TRequest>(async (event: H3Event) => {
-
             try {
-                const { bodyProvider, fetcher, extendFetchOptions, postFetchTransformer } = ctx;
+                const {
+                    bodyProvider,
+                    fetcher,
+                    dummyFetcher,
+                    extendFetchOptions,
+                    postFetchTransformer,
+                } = ctx;
 
                 // Get runtime configuration for API base URL
                 const config = useRuntimeConfig();
 
                 if (!config.apiUrl) {
-                    throw new Error("API URL is not configured in runtime config. Set the env variable API_URL.");
+                    throw new Error(
+                        "API URL is not configured in runtime config. Set the env variable API_URL.",
+                    );
                 }
 
                 // Extract request body using the configured body provider
                 const body = await bodyProvider(event);
-                const method: FetchMethodOptionType = ctx.method === "INHERIT"
-                    ? event.method.toUpperCase() as FetchMethodOptionType
-                    : ctx.method;
+                const method: FetchMethodOptionType =
+                    ctx.method === "INHERIT"
+                        ? (event.method.toUpperCase() as FetchMethodOptionType)
+                        : ctx.method;
 
                 const options = await extendFetchOptions({
                     url: `${config.apiUrl}${url}`,
@@ -90,11 +156,14 @@ export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBod
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    event
+                    event,
                 });
 
                 // Make authenticated request to backend API using the configured fetcher
-                const backendResponse = await fetcher(options);
+                const backendResponse =
+                    config.useDummyData === "true"
+                        ? await dummyFetcher(options)
+                        : await fetcher(options);
 
                 return await postFetchTransformer(backendResponse);
             } catch (err: unknown) {
@@ -108,11 +177,11 @@ export function backendHandlerBuilder<TRequest extends EventHandlerRequest, TBod
         extendFetchOptions,
         withBodyProvider,
         withFetcher,
+        withDummyFetcher,
         postMap,
         build,
-    }
+    };
 }
-
 
 function handleError(err: unknown) {
     let errorMessage = "An unexpected error occurred";
@@ -149,9 +218,7 @@ function handleError(err: unknown) {
         statusCode: 500,
         statusMessage: "Backend Communication Error",
         message:
-            err instanceof Error
-                ? err.message
-                : "An unexpected error occurred",
+            err instanceof Error ? err.message : "An unexpected error occurred",
         data: { originalError: err },
     });
 }

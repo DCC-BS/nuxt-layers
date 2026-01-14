@@ -3,7 +3,9 @@
  * @template T - The backend response type
  * @template D - The final response type to return to the client
  */
-export type BackendTransformer<TResponse, TTransformed> = (response: TResponse) => Promise<TTransformed>;
+export type BackendTransformer<TResponse, TTransformed> = (
+    response: TResponse,
+) => Promise<TTransformed>;
 
 /**
  * Default response handler that simply passes through the backend response

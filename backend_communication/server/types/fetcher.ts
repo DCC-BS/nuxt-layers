@@ -35,10 +35,10 @@ export async function defaultFetcher<TBody, TResponse>(
 
     const signal = getAbortSignal(event);
 
-    return await $fetch<TResponse>(url, {
+    return (await $fetch<TResponse>(url, {
         method,
         body: JSON.stringify(body),
         headers,
         signal: signal,
-    }) as TResponse;
+    })) as TResponse;
 }
