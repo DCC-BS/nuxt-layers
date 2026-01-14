@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
 
     const config = useRuntimeConfig().feedback;
 
-    const githubToken = config.githubToken;
+    const githubToken = config.githubToken ?? process.env.GITHUB_TOKEN;
     const repo = config.repo;
     const owner = config.repoOwner;
     const project = config.project;

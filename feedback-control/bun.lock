@@ -1,18 +1,14 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "NoAuth",
       "dependencies": {
-        "motion-v": "^1.7.6",
         "undici": "^7.18.2",
-        "zod": "^4.3.5",
       },
       "devDependencies": {
         "@biomejs/biome": "^2.3.11",
         "@iconify-json/lucide": "^1.2.83",
-        "@types/dom-to-image": "^2.6.7",
         "@types/node": "^24.10.4",
         "nuxt": "^4.2.2",
         "typescript": "^5.9.3",
@@ -21,6 +17,8 @@
       "peerDependencies": {
         "@nuxt/ui": "^4.3.0",
         "@nuxtjs/i18n": "^10.2.1",
+        "motion-v": "^1.7.6",
+        "zod": "^4.3.5",
       },
     },
   },
@@ -630,8 +628,6 @@
     "@tiptap/y-tiptap": ["@tiptap/y-tiptap@3.0.1", "", { "dependencies": { "lib0": "^0.2.100" }, "peerDependencies": { "prosemirror-model": "^1.7.1", "prosemirror-state": "^1.2.3", "prosemirror-view": "^1.9.10", "y-protocols": "^1.0.1", "yjs": "^13.5.38" } }, "sha512-F3hj5X77ckmyIywbCQpKgyX3xKra2/acJPWaV5R9wqp0cUPBmm62FYbkQ6HaqxH1VhCkUhhAZcDSQjbjj7tnWw=="],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg=="],
-
-    "@types/dom-to-image": ["@types/dom-to-image@2.6.7", "", {}, "sha512-me5VbCv+fcXozblWwG13krNBvuEOm6kA5xoa4RrjDJCNFOZSWR3/QLtOXimBHk1Fisq69Gx3JtOoXtg1N1tijg=="],
 
     "@types/estree": ["@types/estree@1.0.8", "", {}, "sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w=="],
 

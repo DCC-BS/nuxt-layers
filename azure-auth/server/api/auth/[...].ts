@@ -30,7 +30,7 @@ function decodeJWT(token: string) {
 }
 
 async function getApiAccessToken(refreshToken: unknown) {
-    const config = useRuntimeConfig();
+    const config = useRuntimeConfig().auth;
     const url = `https://login.microsoftonline.com/${config.azureAdTenantId}/oauth2/v2.0/token`;
     const body = new URLSearchParams({
         grant_type: "refresh_token",
@@ -55,16 +55,16 @@ async function getApiAccessToken(refreshToken: unknown) {
 }
 
 export default NuxtAuthHandler({
-    secret: useRuntimeConfig().authSecret,
+    secret: useRuntimeConfig().auth.authSecret,
     pages: {
         signIn: "/auth/signin",
     },
     providers: [
-        // @ts-expect-error
+        // @ts-ignore
         AzureAD.default({
-            clientId: useRuntimeConfig().azureAdClientId,
-            clientSecret: useRuntimeConfig().azureAdClientSecret,
-            tenantId: useRuntimeConfig().azureAdTenantId,
+            clientId: useRuntimeConfig().auth.azureAdClientId,
+            clientSecret: useRuntimeConfig().auth.azureAdClientSecret,
+            tenantId: useRuntimeConfig().auth.azureAdTenantId,
             authorization: {
                 params: {
                     scope: "openid profile email offline_access User.Read",

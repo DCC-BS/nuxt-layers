@@ -40,14 +40,14 @@ export function backendHandlerBuilder<
     const ctx = {
         fetcher: defaultFetcher<TBody, TResponse>,
         dummyFetcher: defaultDummyFetcher<TBody, TResponse>(),
-        bodyProvider: getDefaultBodyProvider<TRequest, TBody>(),
+        bodyProvider: undefined as BodyProvider<TRequest, TBody> | undefined,
         method: "INHERIT" as FetchMethodType,
         postFetchTransformer: defaultTransformer as BackendTransformer<
             TResponse,
             TResponseTransformed
         >,
         extendFetchOptions: defaultExtendFetchOptions<TBody>,
-        ...context,
+        ...context ?? {}
     };
 
     function withFetcher<TNewResponse>(fetcher: Fetcher<TBody, TNewResponse>) {
@@ -142,13 +142,17 @@ export function backendHandlerBuilder<
                     );
                 }
 
-                // Extract request body using the configured body provider
-                const body = await bodyProvider(event);
-                const method: FetchMethodOptionType =
-                    ctx.method === "INHERIT"
-                        ? (event.method.toUpperCase() as FetchMethodOptionType)
-                        : ctx.method;
+                const method: FetchMethodOptionType = ctx.method === "INHERIT"
+                    ? event.method.toUpperCase() as FetchMethodOptionType
+                    : ctx.method;
 
+                // Extract request body using the configured body provider
+                let bodyProviderOrDefault = bodyProvider;
+                if (!bodyProviderOrDefault) {
+                    bodyProviderOrDefault = getDefaultBodyProvider(method);
+                }
+
+                const body = await bodyProviderOrDefault(event);
                 const options = await extendFetchOptions({
                     url: `${config.apiUrl}${url}`,
                     method,

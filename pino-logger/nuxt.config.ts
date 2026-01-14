@@ -9,4 +9,16 @@ export default defineNuxtConfig({
             include: ["pino"],
         },
     },
+    runtimeConfig: {
+        public: {
+            logger: {
+                loglevel: (process.env.NODE_ENV === "production"
+                    ? "warn"
+                    : "debug") as LogLevel,
+                includeStackTrace: true,
+                stackTraceLimit: 5,
+                logAllRequests: false,
+            },
+        },
+    },
 });
