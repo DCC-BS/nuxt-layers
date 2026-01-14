@@ -1,7 +1,28 @@
-import { createError, defineEventHandler, type EventHandler, type EventHandlerRequest, type H3Event, } from "h3";
-import type { BackendTransformer, BodyProvider, Fetcher, FetcherOptions, FetchMethodOptionType, FetchMethodType } from "../types";
-import { defaultFetcher, defaultTransformer, getDefaultBodyProvider, } from "../types";
-import { createDummyFetcher, type DummyFetcherData, defaultDummyFetcher, } from "../types/dummy_fetcher";
+import {
+    createError,
+    defineEventHandler,
+    type EventHandler,
+    type EventHandlerRequest,
+    type H3Event,
+} from "h3";
+import type {
+    BackendTransformer,
+    BodyProvider,
+    Fetcher,
+    FetcherOptions,
+    FetchMethodOptionType,
+    FetchMethodType,
+} from "../types";
+import {
+    defaultFetcher,
+    defaultTransformer,
+    getDefaultBodyProvider,
+} from "../types";
+import {
+    createDummyFetcher,
+    type DummyFetcherData,
+    defaultDummyFetcher,
+} from "../types/dummy_fetcher";
 
 type FetchOptionsExtender<TBody> = (
     options: FetcherOptions<TBody>,
@@ -47,7 +68,7 @@ export function backendHandlerBuilder<
             TResponseTransformed
         >,
         extendFetchOptions: defaultExtendFetchOptions<TBody>,
-        ...context ?? {}
+        ...(context ?? {}),
     };
 
     function withFetcher<TNewResponse>(fetcher: Fetcher<TBody, TNewResponse>) {
@@ -56,7 +77,10 @@ export function backendHandlerBuilder<
                 ...ctx,
                 fetcher,
                 dummyFetcher: defaultDummyFetcher<TBody, TNewResponse>(),
-                postFetchTransformer: defaultTransformer as BackendTransformer<TNewResponse, TNewResponse>,
+                postFetchTransformer: defaultTransformer as BackendTransformer<
+                    TNewResponse,
+                    TNewResponse
+                >,
             });
         return builder;
     }
@@ -66,7 +90,10 @@ export function backendHandlerBuilder<
             backendHandlerBuilder<TRequest, TBody, TResponse, TResponse>({
                 ...ctx,
                 dummyFetcher: createDummyFetcher<TBody, TResponse>(dummyData),
-                postFetchTransformer: defaultTransformer as BackendTransformer<TResponse, TResponse>,
+                postFetchTransformer: defaultTransformer as BackendTransformer<
+                    TResponse,
+                    TResponse
+                >,
             });
         return builder;
     }
@@ -136,9 +163,10 @@ export function backendHandlerBuilder<
                     );
                 }
 
-                const method: FetchMethodOptionType = ctx.method === "INHERIT"
-                    ? event.method.toUpperCase() as FetchMethodOptionType
-                    : ctx.method;
+                const method: FetchMethodOptionType =
+                    ctx.method === "INHERIT"
+                        ? (event.method.toUpperCase() as FetchMethodOptionType)
+                        : ctx.method;
 
                 // Extract request body using the configured body provider
                 let bodyProviderOrDefault = bodyProvider;
