@@ -1,4 +1,6 @@
 export default defineNuxtConfig({
-    extends: ['..'],
-    modules: ['@nuxt/eslint'],
-})
+    extends: [".."],
+    runtimeConfig: {
+        useDummyData: "false",
+    },
+});
