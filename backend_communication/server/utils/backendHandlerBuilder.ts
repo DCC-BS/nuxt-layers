@@ -227,12 +227,20 @@ export function backendHandlerBuilder<
 function parseUrl(url: string, event: H3Event) {
     const query = getQuery(event);
 
-    let parsedUrl = url.replace(/\[q:([^\]]+)\]/g, (match, queryName) => {
-        return (query[queryName] as string) || "";
+    let parsedUrl = url.replace(/\[q:([^\]]+)\]/g, (_, queryName) => {
+        const value = query[queryName];
+        if (value === undefined || value === null) {
+            console.warn(`Missing query parameter: ${queryName}`);
+        }
+        return (value as string) ?? "";
     });
 
-    parsedUrl = parsedUrl.replace(/\[r:([^\]]+)\]/g, (match, paramName) => {
-        return getRouterParam(event, paramName) || "";
+    parsedUrl = parsedUrl.replace(/\[r:([^\]]+)\]/g, (_, paramName) => {
+        const value = getRouterParam(event, paramName);
+        if (!value) {
+            console.warn(`Missing router parameter: ${paramName}`);
+        }
+        return value ?? "";
     });
 
     return parsedUrl;

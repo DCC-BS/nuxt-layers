@@ -5,4 +5,4 @@ export default backendHandlerBuilder()
 
         return Promise.resolve({ url: options.url });
     })
-    .build("?lname=[r:lastname]&sname=[r:surname]&age=[q:age]&heigh=[q:height]");
+    .build("?lname=[r:lastname]&sname=[r:surname]&age=[q:age]&height=[q:height]");
