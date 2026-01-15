@@ -56,7 +56,7 @@ export function backendHandlerBuilder<
         return builder;
     }
 
-    function withDummyFetcher<TNewResponse = TResponse>(dummyData: DummyFetcherData<TBody, TNewResponse>) {
+    function withDummyFetcher<TNewResponse extends TResponse = TResponse>(dummyData: DummyFetcherData<TBody, TNewResponse>) {
         const { withBodyProvider, withFetcher, withDummyFetcher, ...builder } = backendHandlerBuilder<
             TRequest,
             TBody,
@@ -64,7 +64,7 @@ export function backendHandlerBuilder<
             TResponse
         >({
             ...ctx,
-            dummyFetcher: createDummyFetcher<TBody, TResponse>(dummyData),
+            dummyFetcher: createDummyFetcher<TBody, TNewResponse>(dummyData),
             postFetchTransformer: defaultTransformer as BackendTransformer<TResponse, TResponse>,
         });
         return builder;

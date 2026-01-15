@@ -10,7 +10,7 @@ export function useLogger(): BaseLogger {
     // Access the logger from the plugin
     const { $logger } = useNuxtApp();
 
-    // Check if logger exists, which should be provided by the a plugin
+    // Check if logger exists, which should be provided by a plugin
     if (!$logger) {
         throw new Error(
             "Logger not available. Make sure the logger plugin is properly initialized.",
