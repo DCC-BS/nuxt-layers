@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 const logger = useLogger();
 
 onMounted(async () => {
@@ -11,7 +10,6 @@ onMounted(async () => {
 
     logger.info(result2, "test 2 api called");
 });
-
 </script>
 
 <template>

@@ -1,8 +1,8 @@
 export default backendHandlerBuilder()
     .withDummyFetcher((options) => {
-        return ({
+        return {
             url: options.url,
             method: options.method,
-        });
+        };
     })
-    .build("/some/url")
+    .build("/some/url");
