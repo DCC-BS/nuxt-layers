@@ -14,6 +14,7 @@ import type {
     FetchMethodType,
 } from "../types";
 import {
+    defaultBodyProvider,
     defaultFetcher,
     defaultTransformer,
     getDefaultBodyProvider,
@@ -61,7 +62,7 @@ export function backendHandlerBuilder<
     const ctx = {
         fetcher: defaultFetcher<TBody, TResponse>,
         dummyFetcher: defaultDummyFetcher<TResponse>,
-        bodyProvider: undefined as BodyProvider<TRequest, TBody> | undefined,
+        bodyProvider: defaultBodyProvider<TRequest, TBody>(),
         method: "INHERIT" as FetchMethodType,
         postFetchTransformer: defaultTransformer as BackendTransformer<
             TResponse,
@@ -71,11 +72,13 @@ export function backendHandlerBuilder<
         ...(context ?? {}),
     };
 
-    function withFetcher<TNewResponse>(fetcher: Fetcher<TBody, TNewResponse>) {
+    function withFetcher<TNewResponse>(
+        fetcher: Fetcher<TBody, TNewResponse> | undefined,
+    ) {
         const { withBodyProvider, withFetcher, ...builder } =
             backendHandlerBuilder<TRequest, TBody, TNewResponse, TNewResponse>({
                 ...ctx,
-                fetcher,
+                fetcher: fetcher ?? defaultFetcher<TBody, TNewResponse>,
                 dummyFetcher: defaultDummyFetcher<TNewResponse>,
                 postFetchTransformer: defaultTransformer as BackendTransformer<
                     TNewResponse,
@@ -103,7 +106,7 @@ export function backendHandlerBuilder<
     }
 
     function withBodyProvider<TNewBody>(
-        bodyProvider: BodyProvider<TRequest, TNewBody>,
+        bodyProvider: BodyProvider<TRequest, TNewBody> | undefined,
     ) {
         const { withBodyProvider, ...builder } = backendHandlerBuilder<
             TRequest,
@@ -112,7 +115,8 @@ export function backendHandlerBuilder<
             TResponseTransformed
         >({
             ...ctx,
-            bodyProvider,
+            bodyProvider:
+                bodyProvider ?? defaultBodyProvider<TRequest, TNewBody>(),
             fetcher: defaultFetcher<TNewBody, TResponse>,
             dummyFetcher: defaultDummyFetcher<TResponse>,
             extendFetchOptions:
@@ -148,7 +152,7 @@ export function backendHandlerBuilder<
     }
 
     function build(
-        url: string,
+        url: string | ((event: H3Event) => string),
     ): EventHandler<TRequest, Promise<TResponseTransformed>> {
         return defineEventHandler<TRequest>(async (event: H3Event) => {
             try {
@@ -159,6 +163,11 @@ export function backendHandlerBuilder<
                     extendFetchOptions,
                     postFetchTransformer,
                 } = ctx;
+
+                const parsedUrl =
+                    typeof url === "string"
+                        ? parseUrl(url, event)
+                        : parseUrl(url(event), event);
 
                 // Get runtime configuration for API base URL
                 const config = useRuntimeConfig();
@@ -182,7 +191,7 @@ export function backendHandlerBuilder<
 
                 const body = await bodyProviderOrDefault(event);
                 const options = await extendFetchOptions({
-                    url: `${config.apiUrl}${url}`,
+                    url: `${config.apiUrl}${parsedUrl}`,
                     method,
                     body: body,
                     headers: {
@@ -213,6 +222,28 @@ export function backendHandlerBuilder<
         postMap,
         build,
     };
+}
+
+function parseUrl(url: string, event: H3Event) {
+    const query = getQuery(event);
+
+    let parsedUrl = url.replace(/\[q:([^\]]+)\]/g, (_, queryName) => {
+        const value = query[queryName];
+        if (value === undefined || value === null) {
+            console.warn(`Missing query parameter: ${queryName}`);
+        }
+        return (value as string) ?? "";
+    });
+
+    parsedUrl = parsedUrl.replace(/\[r:([^\]]+)\]/g, (_, paramName) => {
+        const value = getRouterParam(event, paramName);
+        if (!value) {
+            console.warn(`Missing router parameter: ${paramName}`);
+        }
+        return value ?? "";
+    });
+
+    return parsedUrl;
 }
 
 function handleError(err: unknown) {
