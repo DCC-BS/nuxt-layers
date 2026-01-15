@@ -29,11 +29,6 @@ export function createDummyFetcher<TBody, TResponse>(
     };
 }
 
-export function defaultDummyFetcher<TBody, TResponse>(): Fetcher<
-    TBody,
-    TResponse
-> {
-    throw new Error(
-        "Default dummy fetcher called without data. Use withDummyFetcher() to provide data.",
-    );
+export function defaultDummyFetcher<TBody, TResponse>(): Promise<TResponse> {
+    throw new Error("Default dummy fetcher called without data. Use withDummyFetcher() to provide data.");
 }

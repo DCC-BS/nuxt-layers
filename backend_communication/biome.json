@@ -15,9 +15,10 @@
         "indentWidth": 4
     },
     "assist": {
+        "enabled": true,
         "actions": {
             "source": {
-                "organizeImports": "on"
+                "recommended": true
             }
         }
     },
@@ -41,7 +42,8 @@
     },
     "javascript": {
         "formatter": {
-            "quoteStyle": "double"
+            "quoteStyle": "double",
+            "trailingCommas": "all"
         }
     },
     "overrides": [

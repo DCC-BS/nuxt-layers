@@ -15,9 +15,7 @@ export type FetcherOptions<TBody> = {
  * Function type for making HTTP requests to the backend
  * @template T - The response type from the backend
  */
-export type Fetcher<TBody, TResponse> = (
-    options: FetcherOptions<TBody>,
-) => Promise<TResponse>;
+export type Fetcher<TBody, TResponse> = (options: FetcherOptions<TBody>) => Promise<TResponse>;
 
 /**
  * Default fetcher that uses Nuxt's $fetch utility
@@ -28,9 +26,7 @@ export type Fetcher<TBody, TResponse> = (
  * @param headers - HTTP headers to include
  * @returns Promise resolving to the backend response
  */
-export async function defaultFetcher<TBody, TResponse>(
-    options: FetcherOptions<TBody>,
-): Promise<TResponse> {
+export async function defaultFetcher<TBody, TResponse>(options: FetcherOptions<TBody>): Promise<TResponse> {
     const { url, method, body, headers, event } = options;
 
     const signal = getAbortSignal(event);

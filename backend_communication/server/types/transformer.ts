@@ -3,9 +3,7 @@
  * @template T - The backend response type
  * @template D - The final response type to return to the client
  */
-export type BackendTransformer<TResponse, TTransformed> = (
-    response: TResponse,
-) => Promise<TTransformed>;
+export type BackendTransformer<TResponse, TTransformed> = (response: TResponse) => Promise<TTransformed>;
 
 /**
  * Default response handler that simply passes through the backend response
@@ -14,8 +12,6 @@ export type BackendTransformer<TResponse, TTransformed> = (
  * @param response - The response from the backend API
  * @returns Promise resolving to the response cast to the expected type
  */
-export async function defaultTransformer<TResponse>(
-    response: TResponse,
-): Promise<TResponse> {
+export async function defaultTransformer<TResponse>(response: TResponse): Promise<TResponse> {
     return response as unknown as TResponse;
 }
