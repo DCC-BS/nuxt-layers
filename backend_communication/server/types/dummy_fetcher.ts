@@ -14,12 +14,6 @@ export function createDummyFetcher<TBody, TResponse>(
     dummyData: DummyFetcherData<TBody, TResponse>,
 ): Fetcher<TBody, TResponse> {
     return (options: FetcherOptions<TBody>) => {
-        const { url, event } = options;
-
-        const logger = getEventLogger(event);
-
-        logger.debug(options, `fetching data from ${url}`);
-
         if (isFunction<TBody, TResponse>(dummyData)) {
             const result = dummyData(options);
             return Promise.resolve(result);
