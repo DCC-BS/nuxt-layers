@@ -73,7 +73,7 @@ export function backendHandlerBuilder<
     };
 
     function withFetcher<TNewResponse>(
-        fetcher: Fetcher<TBody, TNewResponse> | undefined,
+        fetcher: Fetcher<TBody, TNewResponse> | undefined = undefined,
     ) {
         const { withBodyProvider, withFetcher, ...builder } =
             backendHandlerBuilder<TRequest, TBody, TNewResponse, TNewResponse>({
@@ -106,7 +106,7 @@ export function backendHandlerBuilder<
     }
 
     function withBodyProvider<TNewBody>(
-        bodyProvider: BodyProvider<TRequest, TNewBody> | undefined,
+        bodyProvider: BodyProvider<TRequest, TNewBody> | undefined = undefined,
     ) {
         const { withBodyProvider, ...builder } = backendHandlerBuilder<
             TRequest,
