@@ -18,6 +18,7 @@ import {
     defaultFetcher,
     defaultTransformer,
     getDefaultBodyProvider,
+    rawFetcher,
 } from "../types";
 import {
     createDummyFetcher,
@@ -72,10 +73,14 @@ export function backendHandlerBuilder<
         ...(context ?? {}),
     };
 
+    function withRawFetcher() {
+        return withFetcher<Response>(rawFetcher);
+    }
+
     function withFetcher<TNewResponse>(
         fetcher: Fetcher<TBody, TNewResponse> | undefined = undefined,
     ) {
-        const { withBodyProvider, withFetcher, ...builder } =
+        const { withBodyProvider, withFetcher, withRawFetcher, ...builder } =
             backendHandlerBuilder<TRequest, TBody, TNewResponse, TNewResponse>({
                 ...ctx,
                 fetcher: fetcher ?? defaultFetcher<TBody, TNewResponse>,
@@ -91,7 +96,7 @@ export function backendHandlerBuilder<
     function withDummyFetcher<TNewResponse extends TResponse = TResponse>(
         dummyData: DummyFetcherData<TBody, TNewResponse>,
     ) {
-        const { withBodyProvider, withFetcher, withDummyFetcher, ...builder } =
+        const { withBodyProvider, withFetcher, withRawFetcher, withDummyFetcher, ...builder } =
             backendHandlerBuilder<TRequest, TBody, TResponse, TResponse>({
                 ...ctx,
                 dummyFetcher: createDummyFetcher<TBody, TNewResponse>(
@@ -141,7 +146,7 @@ export function backendHandlerBuilder<
     function postMap<TMap>(
         transformer: BackendTransformer<TResponseTransformed, TMap>,
     ) {
-        const { withBodyProvider, withFetcher, ...builder } =
+        const { withBodyProvider, withFetcher, withRawFetcher, ...builder } =
             backendHandlerBuilder({
                 ...ctx,
                 postFetchTransformer: async (x) =>
@@ -218,6 +223,7 @@ export function backendHandlerBuilder<
         extendFetchOptions,
         withBodyProvider,
         withFetcher,
+        withRawFetcher,
         withDummyFetcher,
         postMap,
         build,

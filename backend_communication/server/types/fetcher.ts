@@ -1,3 +1,4 @@
+import { apiFetch, isApiError } from "@dcc-bs/communication.bs.js";
 import type { H3Event } from "h3";
 
 export type FetchMethodOptionType = "GET" | "POST" | "PUT" | "DELETE";
@@ -34,11 +35,38 @@ export async function defaultFetcher<TBody, TResponse>(
     const { url, method, body, headers, event } = options;
 
     const signal = getAbortSignal(event);
+    const logger = getEventLogger(event);
 
-    return (await $fetch<TResponse>(url, {
+    if (typeof body !== "object" && body !== undefined) {
+        throw new Error(`Request body must be object or undefined, got: ${typeof body}`);
+    }
+
+    const response = await apiFetch(url, {
         method,
-        body: JSON.stringify(body),
+        body: body as object | undefined,
         headers,
+        signal,
+    });
+
+    if (isApiError(response)) {
+        logger.error(response, `API Error on fetch to ${url}`);
+        throw response;
+    }
+
+    return response as TResponse;
+}
+
+export async function rawFetcher<TBody>(
+    options: FetcherOptions<TBody>,
+): Promise<Response> {
+    const body = options.body !== undefined ? JSON.stringify(options.body) : undefined;
+
+    const signal = getAbortSignal(options.event);
+
+    return await fetch(options.url, {
+        method: options.method,
+        body: body,
+        headers: options.headers,
         signal: signal,
-    })) as TResponse;
+    });
 }
