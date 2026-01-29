@@ -59,7 +59,7 @@ export async function defaultFetcher<TBody, TResponse>(
 export async function rawFetcher<TBody>(
     options: FetcherOptions<TBody>,
 ): Promise<Response> {
-    const body = (options.body) ? JSON.stringify(options.body) : undefined;
+    const body = options.body !== undefined ? JSON.stringify(options.body) : undefined;
 
     const signal = getAbortSignal(options.event);
 
