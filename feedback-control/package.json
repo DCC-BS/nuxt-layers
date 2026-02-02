@@ -20,7 +20,7 @@
     },
     "type": "module",
     "dependencies": {
-        "undici": "^7.18.2"
+        "undici": "^7.20.0"
     },
     "peerDependencies": {
         "@nuxt/ui": "^4.3.0",
