@@ -5,7 +5,7 @@ function getExtends() {
     const layers: Array<[string, SourceOptions?]> = [];
 
     if (process.env.LOGGER_LAYER_URI) {
-        layers.push([process.env.LOGGER_LAYER_URI, { install: true }]);
+        layers.push([process.env.LOGGER_LAYER_URI]);
     }
 
     return layers;

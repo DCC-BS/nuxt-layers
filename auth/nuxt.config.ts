@@ -4,12 +4,11 @@ function getExtends() {
     const layers: Array<[string, SourceOptions?]> = [];
 
     if (process.env.AUTH_LAYER_URI) {
-        layers.push([process.env.AUTH_LAYER_URI, { install: true }]);
+        layers.push([process.env.AUTH_LAYER_URI]);
     }
 
     layers.push([
-        "github:DCC-BS/nuxt-layers/backend_communication",
-        { install: true },
+        "github:DCC-BS/nuxt-layers/backend_communication"
     ]);
 
     return layers;
