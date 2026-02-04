@@ -40,7 +40,7 @@ export default defineNuxtConfig({
             azureAdClientSecret: process.env.AUTH_AZURE_AD_CLIENT_SECRET,
             azureAdAPIClientId: process.env.AUTH_AZURE_AD_API_CLIENT_ID,
             authSecret: process.env.AUTH_AUTH_SECRET,
-            origin: process.env.AUTH_ORIGIN
+            origin: "",
         }
     },
 });

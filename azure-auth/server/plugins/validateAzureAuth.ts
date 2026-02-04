@@ -32,9 +32,9 @@ export default defineNitroPlugin(() => {
         );
     }
 
-    if (!process.env.AUTH_ORIGIN) {
+    if (!config.auth.origin) {
         console.error(
-            "AZURE AUTH: AUTH_ORIGIN environment variable is not defined.",
+            "AZURE AUTH: Auth Origin is not defined in runtime config.",
         );
     }
 });
