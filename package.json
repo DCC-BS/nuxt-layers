@@ -8,7 +8,8 @@
         "no-auth",
         "azure-auth",
         "health_check",
-        "backend_communication"
+        "backend_communication",
+        "env-utils"
     ],
     "scripts": {
         "create:layer": "bunx create-layer.ts",
