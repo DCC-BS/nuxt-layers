@@ -16,10 +16,7 @@ function decodeJWT(token: string) {
         const jsonPayload = decodeURIComponent(
             atob(base64)
                 .split("")
-                .map(
-                    (c) =>
-                        `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`,
-                )
+                .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
                 .join(""),
         );
         return JSON.parse(jsonPayload);
@@ -30,14 +27,14 @@ function decodeJWT(token: string) {
 }
 
 async function getApiAccessToken(refreshToken: unknown) {
-    const config = useRuntimeConfig().auth;
-    const url = `https://login.microsoftonline.com/${config.azureAdTenantId}/oauth2/v2.0/token`;
+    const config = useRuntimeConfig().azureAuth;
+    const url = `https://login.microsoftonline.com/${config.tenantId}/oauth2/v2.0/token`;
     const body = new URLSearchParams({
         grant_type: "refresh_token",
         refresh_token: refreshToken,
-        client_id: config.azureAdClientId,
-        client_secret: config.azureAdClientSecret,
-        scope: `api://${config.azureAdAPIClientId}/user_impersonation`,
+        client_id: config.clientId,
+        client_secret: config.clientSecret,
+        scope: `api://${config.apiClientId}/user_impersonation`,
     } as Record<string, string>);
     const response = await $fetch<{ access_token: string | undefined }>(url, {
         method: "POST",
@@ -55,16 +52,16 @@ async function getApiAccessToken(refreshToken: unknown) {
 }
 
 export default NuxtAuthHandler({
-    secret: useRuntimeConfig().auth.authSecret,
+    secret: useRuntimeConfig().azureAuth.secret,
     pages: {
         signIn: "/auth/signin",
     },
     providers: [
         // @ts-ignore
         AzureAD.default({
-            clientId: useRuntimeConfig().auth.azureAdClientId,
-            clientSecret: useRuntimeConfig().auth.azureAdClientSecret,
-            tenantId: useRuntimeConfig().auth.azureAdTenantId,
+            clientId: useRuntimeConfig().azureAuth.clientId,
+            clientSecret: useRuntimeConfig().azureAuth.clientSecret,
+            tenantId: useRuntimeConfig().azureAuth.tenantId,
             authorization: {
                 params: {
                     scope: "openid profile email offline_access User.Read",
