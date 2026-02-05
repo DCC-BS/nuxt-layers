@@ -1,40 +1,40 @@
 export default defineNitroPlugin(() => {
-
     const config = useRuntimeConfig();
+    const auth_config = config.azureAuth;
 
-    if (!config.auth.azureAdTenantId) {
+    if (!auth_config.tenantId) {
         console.error(
-            "AZURE AUTH: Azure AD Tenant ID is not defined in runtime config.",
+            "AZURE AUTH: Tenant ID is missing. Set the environment variable NUXT_AZURE_AUTH_TENANT_ID",
         );
     }
 
-    if (!config.auth.azureAdClientId) {
+    if (!auth_config.clientId) {
         console.error(
-            "AZURE AUTH: Azure AD Client ID is not defined in runtime config.",
+            "AZURE AUTH: Client ID is missing. Set the environment variable NUXT_AZURE_AUTH_CLIENT_ID",
         );
     }
 
-    if (!config.auth.azureAdClientSecret) {
+    if (!auth_config.clientSecret) {
         console.error(
-            "AZURE AUTH: Azure AD Client Secret is not defined in runtime config.",
+            "AZURE AUTH: Client Secret is missing. Set the environment variable NUXT_AZURE_AUTH_CLIENT_SECRET",
         );
     }
 
-    if (!config.auth.azureAdAPIClientId) {
+    if (!auth_config.apiClientId) {
         console.error(
-            "AZURE AUTH: Azure AD API Client ID is not defined in runtime config.",
+            "AZURE AUTH: API Client ID is missing. Set the environment variable NUXT_AZURE_AUTH_API_CLIENT_ID",
         );
     }
 
-    if (!config.auth.authSecret) {
+    if (!auth_config.secret) {
         console.error(
-            "AZURE AUTH: Auth Secret is not defined in runtime config.",
+            "AZURE AUTH: Auth Secret is missing. Set the environment variable NUXT_AZURE_AUTH_SECRET",
         );
     }
 
-    if (!config.auth.origin) {
+    if (!auth_config.origin) {
         console.error(
-            "AZURE AUTH: Auth Origin is not defined in runtime config.",
+            "AZURE AUTH: Origin is missing. Set the environment variable NUXT_AZURE_AUTH_ORIGIN",
         );
     }
 });

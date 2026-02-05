@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     auth: {
         isEnabled: true,
         globalAppMiddleware: true,
-        originEnvKey: "NUXT_AUTH_ORIGIN",
+        originEnvKey: "NUXT_AZURE_AUTH_ORIGIN",
         provider: {
             type: "authjs",
             defaultProvider: "azureAd",
@@ -34,13 +34,13 @@ export default defineNuxtConfig({
         ],
     },
     runtimeConfig: {
-        auth: {
-            azureAdTenantId: process.env.AUTH_AZURE_AD_TENANT_ID,
-            azureAdClientId: process.env.AUTH_AZURE_AD_CLIENT_ID,
-            azureAdClientSecret: process.env.AUTH_AZURE_AD_CLIENT_SECRET,
-            azureAdAPIClientId: process.env.AUTH_AZURE_AD_API_CLIENT_ID,
-            authSecret: process.env.AUTH_AUTH_SECRET,
+        azureAuth: {
+            tenantId: "",
+            clientId: "",
+            clientSecret: "",
+            apiClientId: "",
+            secret: "",
             origin: "",
-        }
+        },
     },
 });
