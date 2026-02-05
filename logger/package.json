@@ -12,10 +12,10 @@
         "check": "bunx biome check --write"
     },
     "devDependencies": {
-        "@types/node": "^24.10.4",
+        "@types/node": "25.2.1",
         "c12": "^3.3.3",
-        "nuxt": "^4.2.2",
+        "nuxt": "4.3.0",
         "typescript": "^5.9.3",
-        "vue": "latest"
+        "vue": "3.5.27"
     }
 }
