@@ -14,7 +14,7 @@ export function useNavigationBreadcrumbs(): void {
             type: "navigation",
             category: "navigation",
             level: "info",
-            message: `Navigation: ${from} → ${to}`,
+            message: `Navigation: ${from.fullPath} → ${to.fullPath}`,
         });
     });
 }

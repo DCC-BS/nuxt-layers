@@ -11,16 +11,25 @@ export function useFetchBreadcrumbs(): void {
     const originalFetch = window.fetch;
 
     window.fetch = async (input, init) => {
-        const url = typeof input === "string" ? input : (input as Request).url;
+        let url: string;
+        let method: string;
+
+        if (input instanceof Request) {
+            url = input.url;
+            method = input.method || "GET";
+        } else {
+            url = input;
+            method = "GET";
+        }
 
         breadcrumbManager.addBreadcrumb({
             type: "http",
             category: "http",
             level: "info",
-            message: `HTTP Request: ${(input as Request).method || "GET"} ${url}`,
+            message: `HTTP Request: ${method} ${url}`,
             data: {
                 url,
-                method: (input as Request).method || "GET",
+                method,
             },
         });
 
@@ -34,7 +43,7 @@ export function useFetchBreadcrumbs(): void {
                 message: `HTTP Response: ${response.status} ${url}`,
                 data: {
                     url,
-                    method: (input as Request).method || "GET",
+                    method,
                     status: response.status,
                 },
             });
@@ -48,9 +57,8 @@ export function useFetchBreadcrumbs(): void {
                 message: `HTTP Error: ${url}`,
                 data: {
                     url,
-                    method: (input as Request).method || "GET",
-                    error:
-                        error instanceof Error ? error.message : String(error),
+                    method,
+                    error: error instanceof Error ? error.message : String(error),
                 },
             });
 
