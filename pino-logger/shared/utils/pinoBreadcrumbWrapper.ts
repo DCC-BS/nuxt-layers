@@ -3,7 +3,11 @@ import type {
     Breadcrumb,
     BreadcrumbLevel,
 } from "#layers/logger/shared/types/breadcrumb";
-import type { BaseLogger, LogLevel } from "#layers/logger/shared/types/logger";
+import type {
+    BaseLogger,
+    LogFn,
+    LogLevel,
+} from "#layers/logger/shared/types/logger";
 import type { BreadcrumbManager } from "./breadcrumbManager";
 
 const LOG_LEVELS = [
@@ -76,31 +80,31 @@ class BreadcrumbAwareLogger implements BaseLogger {
         }
     }
 
-    fatal: globalThis.LogFn = (...args: unknown[]): void => {
+    fatal: LogFn = (...args: unknown[]): void => {
         this.logWithBreadcrumb("fatal", ...args);
     };
 
-    error: globalThis.LogFn = (...args: unknown[]): void => {
+    error: LogFn = (...args: unknown[]): void => {
         this.logWithBreadcrumb("error", ...args);
     };
 
-    warn: globalThis.LogFn = (...args: unknown[]): void => {
+    warn: LogFn = (...args: unknown[]): void => {
         this.logWithBreadcrumb("warn", ...args);
     };
 
-    info: globalThis.LogFn = (...args: unknown[]): void => {
+    info: LogFn = (...args: unknown[]): void => {
         this.logWithBreadcrumb("info", ...args);
     };
 
-    debug: globalThis.LogFn = (...args: unknown[]): void => {
+    debug: LogFn = (...args: unknown[]): void => {
         this.logWithBreadcrumb("debug", ...args);
     };
 
-    trace: globalThis.LogFn = (...args: unknown[]): void => {
+    trace: LogFn = (...args: unknown[]): void => {
         this.logWithBreadcrumb("trace", ...args);
     };
 
-    silent: globalThis.LogFn = (...args: unknown[]): void => {
+    silent: LogFn = (..._args: unknown[]): void => {
         // Silent: do nothing
     };
 

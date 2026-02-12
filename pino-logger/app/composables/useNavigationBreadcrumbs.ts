@@ -1,4 +1,3 @@
-import { onBeforeRouteLeave } from "vue-router";
 import { useBreadcrumbs } from "#layers/pino-logger/app/composables/useBreadcrumbs";
 
 export function useNavigationBreadcrumbs(): void {
@@ -9,7 +8,9 @@ export function useNavigationBreadcrumbs(): void {
         return;
     }
 
-    onBeforeRouteLeave((to, from) => {
+    const router = useRouter();
+
+    router.afterEach((to, from) => {
         breadcrumbManager.addBreadcrumb({
             type: "navigation",
             category: "navigation",

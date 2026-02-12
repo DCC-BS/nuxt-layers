@@ -20,7 +20,10 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
         timestamp: new Date().toISOString(),
     };
 
-    if (loggerConfig.breadcrumbs?.enabled && loggerConfig.breadcrumbs.autoCollect.xhr) {
+    if (
+        loggerConfig.breadcrumbs?.enabled &&
+        loggerConfig.breadcrumbs.autoCollect.xhr
+    ) {
         breadcrumbManager.addBreadcrumb({
             category: "http",
             type: "http",

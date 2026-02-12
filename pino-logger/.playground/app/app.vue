@@ -5,7 +5,7 @@ const breadcrumbManager = useBreadcrumbs();
 
 logger.error("this is a error");
 
-onMounted(() => {
+onMounted(async () => {
     logger.debug("This is a debug");
     logger.info({ someProps: 5 }, "This is a info");
     logger.warn("This is a warning");
@@ -17,7 +17,7 @@ onMounted(() => {
         origin: "app.vue",
     });
 
-    $fetch("/api/test");
+    await $fetch("/api/test");
 
     const crumbs = logger.getBreadcrumbs();
     logger.info(crumbs, `Total breadcrumbs: ${crumbs.length}`);

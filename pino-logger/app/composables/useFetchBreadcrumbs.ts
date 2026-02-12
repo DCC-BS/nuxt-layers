@@ -58,7 +58,8 @@ export function useFetchBreadcrumbs(): void {
                 data: {
                     url,
                     method,
-                    error: error instanceof Error ? error.message : String(error),
+                    error:
+                        error instanceof Error ? error.message : String(error),
                 },
             });
 
