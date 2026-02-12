@@ -1,4 +1,6 @@
 import { pino, type TransportTargetOptions } from "pino";
+import { createBreadcrumbAwareLogger } from "#layers/pino-logger/shared/utils/pinoBreadcrumbWrapper";
+import { getEventBreadcrumbManager } from "../utils/breadcrumbStorage";
 
 export default defineNitroPlugin((nitroApp) => {
     const loggerConfig = useRuntimeConfig().public.logger;
@@ -19,10 +21,9 @@ export default defineNitroPlugin((nitroApp) => {
         },
     ] as TransportTargetOptions[];
 
-    // Import the logger function from the utils folder
-    const logger = pino({
+    const baseLogger = pino({
         base: { origin: "api" },
-        level: loggerConfig.loglevel,
+        level: loggerConfig.loglevel as string,
         timestamp: true,
         transport: {
             targets: import.meta.dev ? devTargets : productionTargets,
@@ -30,14 +31,17 @@ export default defineNitroPlugin((nitroApp) => {
     });
 
     nitroApp.hooks.hook("error", (error) => {
-        logger.error(error, "An error occurred:");
+        baseLogger.error(error, "An error occurred:");
     });
 
-    // Expose the variable to the Nitro context
     nitroApp.hooks.hook("request", (event) => {
+        const breadcrumbManager = getEventBreadcrumbManager(event);
+        const logger = createBreadcrumbAwareLogger(
+            baseLogger,
+            breadcrumbManager,
+        );
         event.context.logger = logger;
     });
 
-    // Log a message to indicate that the logger is ready
-    logger.info("pino logger initialized");
+    baseLogger.info("pino logger initialized");
 });

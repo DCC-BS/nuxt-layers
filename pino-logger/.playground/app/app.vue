@@ -9,7 +9,10 @@ onMounted(() => {
     logger.warn("This is a warning");
     logger.error("This is an error");
 
-    $fetch("/api/test");
+    const breadcrumbs = logger.getBreadcrumbs();
+    logger.info(`Total breadcrumbs: ${breadcrumbs.length}`);
+
+    logger.clearBreadcrumbs();
 });
 </script>
 
