@@ -16,10 +16,13 @@ export function useFetchBreadcrumbs(): void {
 
         if (input instanceof Request) {
             url = input.url;
-            method = input.method || "GET";
+            method = input.method ?? "GET";
+        } else if (input instanceof URL) {
+            url = input.toString();
+            method = init?.method ?? "GET";
         } else {
             url = input;
-            method = "GET";
+            method = init?.method ?? "GET";
         }
 
         breadcrumbManager.addBreadcrumb({
