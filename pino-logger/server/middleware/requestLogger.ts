@@ -44,17 +44,19 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
         const statusCode = event.node.res.statusCode;
 
         if (statusCode >= 400) {
-            breadcrumbManager.addBreadcrumb({
-                category: "http",
-                type: "http",
-                message: `Failed request (${statusCode})`,
-                level: "error",
-                data: {
-                    method,
-                    url,
-                    statusCode,
-                },
-            });
+            if (loggerConfig.breadcrumbs?.enabled && loggerConfig.breadcrumbs.autoCollect.xhr) {
+                breadcrumbManager.addBreadcrumb({
+                    category: "http",
+                    type: "http",
+                    message: `Failed request (${statusCode})`,
+                    level: "error",
+                    data: {
+                        method,
+                        url,
+                        statusCode,
+                    },
+                });
+            }
 
             logger.error(
                 {
