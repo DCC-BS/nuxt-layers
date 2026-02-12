@@ -28,9 +28,14 @@ export class BreadcrumbManager {
             breadcrumb.level = "info" satisfies BreadcrumbLevel;
         }
 
-        const filtered = this.config.beforeBreadcrumb?.(breadcrumb, hint);
-        if (!filtered) {
-            return;
+        let filtered = breadcrumb;
+
+        if (this.config.beforeBreadcrumb) {
+            const result = this.config.beforeBreadcrumb(breadcrumb, hint);
+            if (!result) {
+                return;
+            }
+            filtered = result;
         }
 
         if (filtered.message) {

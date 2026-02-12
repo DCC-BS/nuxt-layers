@@ -79,12 +79,6 @@ export interface BreadcrumbConfig {
          * @default true
          */
         xhr: boolean;
-
-        /**
-         * Automatically collect UI click events
-         * @default false
-         */
-        clicks: boolean;
     };
 
     /**
@@ -103,6 +97,5 @@ export const DEFAULT_BREADCRUMB_CONFIG: BreadcrumbConfig = {
     autoCollect: {
         navigation: true,
         xhr: true,
-        clicks: false,
     },
 } as const;

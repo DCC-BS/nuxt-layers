@@ -28,7 +28,6 @@ export default defineNuxtConfig({
                     autoCollect: {
                         navigation: true,
                         xhr: true,
-                        clicks: false,
                     },
                 } satisfies BreadcrumbConfig,
             },
