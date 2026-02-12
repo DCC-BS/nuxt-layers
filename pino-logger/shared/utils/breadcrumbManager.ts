@@ -11,7 +11,14 @@ export class BreadcrumbManager {
     private droppedCount = 0;
 
     constructor(config: BreadcrumbConfig) {
-        this.config = { ...DEFAULT_BREADCRUMB_CONFIG, ...config };
+        this.config = {
+            ...DEFAULT_BREADCRUMB_CONFIG,
+            ...config,
+            autoCollect: {
+                ...DEFAULT_BREADCRUMB_CONFIG.autoCollect,
+                ...config.autoCollect,
+            },
+        };
     }
 
     addBreadcrumb(crumb: Partial<Breadcrumb>, hint?: unknown): void {
