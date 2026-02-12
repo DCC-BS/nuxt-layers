@@ -1,3 +1,5 @@
+import type { Breadcrumb, BreadcrumbConfig } from "./breadcrumb";
+
 export type LogLevel =
     | "silent"
     | "fatal"
@@ -82,4 +84,31 @@ export interface BaseLogger {
      * Noop function.
      */
     silent: LogFn;
+
+    /**
+     * Add a breadcrumb to the current scope
+     *
+     * @param breadcrumb - Partial breadcrumb object (timestamp auto-set if not provided)
+     * @param hint - Optional context for beforeBreadcrumb filter
+     */
+    addBreadcrumb(breadcrumb: Partial<Breadcrumb>, hint?: unknown): void;
+
+    /**
+     * Clear all breadcrumbs from the current scope
+     */
+    clearBreadcrumbs(): void;
+
+    /**
+     * Get all breadcrumbs in the current scope
+     *
+     * @returns Readonly array of breadcrumbs (oldest first)
+     */
+    getBreadcrumbs(): readonly Breadcrumb[];
+
+    /**
+     * Update breadcrumb configuration
+     *
+     * @param config - Partial config object to merge with existing config
+     */
+    configureBreadcrumbs(config: Partial<BreadcrumbConfig>): void;
 }

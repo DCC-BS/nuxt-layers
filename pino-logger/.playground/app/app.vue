@@ -1,15 +1,26 @@
 <script setup lang="ts">
 const logger = useLogger();
 
-logger.error("this is a erro");
+const breadcrumbManager = useBreadcrumbs();
 
-onMounted(() => {
+logger.error("this is a error");
+
+onMounted(async () => {
     logger.debug("This is a debug");
-    logger.info("This is a info");
+    logger.info({ someProps: 5 }, "This is a info");
     logger.warn("This is a warning");
     logger.error("This is an error");
 
-    $fetch("/api/test");
+    breadcrumbManager.addBreadcrumb({
+        message: "This is a breadcrumb",
+        category: "test",
+        origin: "app.vue",
+    });
+
+    await $fetch("/api/test");
+
+    const crumbs = logger.getBreadcrumbs();
+    logger.info(crumbs, `Total breadcrumbs: ${crumbs.length}`);
 });
 </script>
 

@@ -11,7 +11,12 @@ export default defineEventHandler((event) => {
         },
         "This is a error with an object",
     );
+
     logger.info("This is a info");
     logger.warn("This is a warning");
     logger.error("This is an error");
+
+    const breadcrumbs = logger.getBreadcrumbs();
+    logger.info(`Total breadcrumbs: ${breadcrumbs.length}`);
+    logger.clearBreadcrumbs();
 });

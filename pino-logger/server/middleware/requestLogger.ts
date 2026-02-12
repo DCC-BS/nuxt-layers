@@ -1,12 +1,7 @@
 import type { H3Event } from "h3";
 import { defineEventHandler, getRequestHeader } from "h3";
+import { getEventBreadcrumbManager } from "../utils/breadcrumbStorage";
 
-/**
- * Server middleware that logs information about incoming requests
- * Logs all requests in development mode, but only failed requests in production
- *
- * @param event - The H3 event object containing request information
- */
 export default defineEventHandler(async (event: H3Event): Promise<void> => {
     const method = event.node.req.method;
     const url = event.node.req.url;
@@ -15,6 +10,7 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
     const loggerConfig = useRuntimeConfig().public.logger;
 
     const logger = getEventLogger(event);
+    const breadcrumbManager = getEventBreadcrumbManager(event);
 
     const requestInfo = {
         method,
@@ -24,6 +20,24 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
         timestamp: new Date().toISOString(),
     };
 
+    if (
+        loggerConfig.breadcrumbs?.enabled &&
+        loggerConfig.breadcrumbs.autoCollect.xhr
+    ) {
+        breadcrumbManager.addBreadcrumb({
+            category: "http",
+            type: "http",
+            message: `${method} ${url}`,
+            level: "info",
+            data: {
+                method,
+                url,
+                remoteAddress,
+                userAgent,
+            },
+        });
+    }
+
     if (loggerConfig.logAllRequests) {
         logger.info(requestInfo, "Incoming request");
         return;
@@ -32,8 +46,21 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
     event.node.res.on("finish", () => {
         const statusCode = event.node.res.statusCode;
 
-        // Log only 4xx and 5xx responses
         if (statusCode >= 400) {
+            if (loggerConfig.breadcrumbs?.enabled && loggerConfig.breadcrumbs.autoCollect.xhr) {
+                breadcrumbManager.addBreadcrumb({
+                    category: "http",
+                    type: "http",
+                    message: `Failed request (${statusCode})`,
+                    level: "error",
+                    data: {
+                        method,
+                        url,
+                        statusCode,
+                    },
+                });
+            }
+
             logger.error(
                 {
                     ...requestInfo,
