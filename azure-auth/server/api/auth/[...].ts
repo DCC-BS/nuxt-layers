@@ -1,7 +1,39 @@
 import AzureAD from "next-auth/providers/azure-ad";
+import Credentials from "next-auth/providers/credentials";
 import { NuxtAuthHandler } from "#auth";
 import { useRuntimeConfig } from "#imports";
 import type { ExtendedJWT, ExtendedSession } from "../../types/authTypes";
+
+async function exchangeTeamsTokenForApiToken(teamsToken: string) {
+    const config = useRuntimeConfig().azureAuth;
+
+    const body = new URLSearchParams({
+        client_id: config.clientId,
+        client_secret: config.clientSecret,
+        grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+        requested_token_use: "on_behalf_of",
+        assertion: teamsToken,
+        scope: `api://${config.apiClientId}/user_impersonation`,
+    } as Record<string, string>);
+
+    const url = `https://login.microsoftonline.com/${config.tenantId}/oauth2/v2.0/token`;
+
+    const resp = await $fetch<{
+        access_token: string;
+        id_token: string;
+        expires_in: number;
+    }>(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body,
+    });
+
+    if (!resp.access_token) {
+        throw new Error("SSO token invalid");
+    }
+
+    return resp;
+}
 
 // Helper function to decode JWT without verification (for reading claims)
 function decodeJWT(token: string) {
@@ -68,11 +100,36 @@ export default NuxtAuthHandler({
                 },
             },
         }),
+        Credentials.default({
+            id: "teams",
+            name: "Microsoft Teams SSO",
+            credentials: {
+              token: { label: "Token", type: "text" },
+            },
+            async authorize(credentials: { token?: string }) {
+              if (!credentials?.token) return null;
+
+              // OBO: validate the Teams token and get an API access token
+              const oboResult = await exchangeTeamsTokenForApiToken(credentials.token);
+              const decoded = decodeJWT(oboResult.access_token);
+
+              if (!decoded) return null;
+
+              // Map decoded claims to a user object for the session
+              return {
+                id: decoded.oid ?? decoded.sub,
+                name: decoded.name,
+                email: decoded.preferred_username ?? decoded.email,
+                roles: decoded.roles ?? [],
+                apiAccessToken: oboResult.access_token,
+              };
+            },
+        })
     ],
     callbacks: {
-        async jwt({ token, account, profile }) {
+        async jwt({ token, account }) {
             const extendedToken = token;
-            if (account && profile) {
+            if (account) {
                 extendedToken.accessToken = account.access_token;
                 extendedToken.refreshToken = account.refresh_token;
                 // ID Token for client side checks

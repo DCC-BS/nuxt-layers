@@ -1,15 +1,15 @@
 <script setup lang="ts">
+import * as microsoftTeams from "@microsoft/teams-js";
+
 definePageMeta({
     auth: { unauthenticatedOnly: true, navigateAuthenticatedTo: "/" },
     layout: "auth",
 });
 
 const { signIn } = useAuth();
-
 const { t } = useI18n();
 
 // Add reactive state for loading animation
-const isLoading = ref(true);
 const loadingText = ref(t("auth.connecting"));
 
 // Simulate loading states for better UX
@@ -21,6 +21,8 @@ const loadingStates = [
 
 let currentStateIndex = 0;
 
+const error = ref<string | null>(null);
+
 onMounted(() => {
     // Cycle through loading states
     const loadingInterval = setInterval(() => {
@@ -28,8 +30,11 @@ onMounted(() => {
         loadingText.value = loadingStates[currentStateIndex] as string;
     }, 1000);
 
-    setTimeout(() => {
-        signIn("azure-ad");
+    setTimeout(async () => {
+        if (!await signInFormTeams()) {
+            error.value = "Teams authentication failed, falling back to Azure AD.";
+            signIn("azure-ad");
+        }
     }, 1500);
 
     // Cleanup interval after 10 seconds
@@ -37,10 +42,33 @@ onMounted(() => {
         clearInterval(loadingInterval);
     }, 1000);
 });
+
+async function signInFormTeams() {
+    if (!window.parent) {
+        error.value = "Not running inside Microsoft Teams.";
+        return false;
+    }
+
+    error.value = "initializing Microsoft Teams authentication...";
+
+    try {
+        await microsoftTeams.app.initialize();
+        const token = await microsoftTeams.authentication.getAuthToken();
+
+        error.value = "signing in with Microsoft Teams token...";
+        await signIn("teams", { token });
+
+        error.value = "no error";
+    } catch (e) {
+        error.value = e instanceof Error ? e.message : String(e);
+        return false;
+    }
+}
 </script>
 
 <template>
     <div class="main-container">
+        <div> error: {{ error }} </div>
         <!-- Animated background elements -->
         <div class="background-overlay">
             <div class="bg-circle bg-circle-1"></div>
