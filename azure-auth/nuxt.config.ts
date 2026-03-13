@@ -1,24 +1,9 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     $meta: {
         name: "azure-auth",
     },
     devtools: { enabled: true },
-    modules: ["@sidebase/nuxt-auth", "@nuxtjs/i18n"],
-    auth: {
-        isEnabled: true,
-        globalAppMiddleware: true,
-        originEnvKey: "NUXT_AZURE_AUTH_ORIGIN",
-        provider: {
-            type: "authjs",
-            defaultProvider: "azureAd",
-            addDefaultCallbackUrl: true,
-        },
-        sessionRefresh: {
-            enablePeriodically: 10000,
-            enableOnWindowFocus: true,
-        },
-    },
+    modules: ["@nuxtjs/i18n"],
     i18n: {
         locales: [
             {
