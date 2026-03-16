@@ -1,11 +1,10 @@
 import type { AuthData } from "#layers/auth/app/types/authData";
 import type { UseAppAuthReturns } from "#layers/auth/app/types/composableTypes";
-import type { Session } from "../types/session";
 
 const sessionKey = "auth:session";
 
 export function useAppAuth(): UseAppAuthReturns {
-    const session = useState<Session | undefined>(sessionKey, () => undefined);
+    const session = useState<AuthSession | undefined>(sessionKey, () => undefined);
 
     const data = computed<AuthData | undefined>(() => {
         if (!session.value?.user) {

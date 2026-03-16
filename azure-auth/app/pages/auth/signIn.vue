@@ -29,7 +29,7 @@ onMounted(async () => {
         clearInterval(loadingInterval);
     }, 1000);
 
-    if(await signInWithTeams()) {
+    if (await signInWithTeams()) {
         return;
     }
 
@@ -53,12 +53,12 @@ async function signInWithTeams() {
         await microsoftTeams.app.initialize();
         const token = await microsoftTeams.authentication.getAuthToken();
 
-        const session = useState<import("../../types/session").Session | null>(
+        const session = useState<AuthSession | null>(
             "auth:session",
             () => null,
         );
 
-        const response = await $fetch<import("../../types/session").Session>(
+        const response = await $fetch<AuthSession>(
             "/api/auth/teams-sso",
             {
                 method: "POST",
@@ -87,18 +87,10 @@ async function signInWithTeams() {
         <div class="content-wrapper">
             <div class="brand-section">
                 <div class="logo-container">
-                    <svg
-                        class="logo-icon"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                        ></path>
+                    <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
+                        </path>
                     </svg>
                 </div>
                 <h1 class="main-title">{{ t("auth.welcomeBack") }}</h1>
@@ -271,6 +263,7 @@ async function signInWithTeams() {
 }
 
 @keyframes pulse {
+
     0%,
     100% {
         opacity: 1;
@@ -282,6 +275,7 @@ async function signInWithTeams() {
 }
 
 @keyframes bounce {
+
     0%,
     20%,
     53%,

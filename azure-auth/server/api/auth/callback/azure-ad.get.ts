@@ -7,28 +7,9 @@ import {
 } from "h3";
 import { SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
-import type { SessionPayload } from "../../../../app/types/session";
 
 const SESSION_COOKIE_NAME = "auth_session";
 const COOKIE_MAX_AGE = 60 * 60 * 24;
-
-function decodeJwtPayload(token: string): Record<string, unknown> | null {
-    try {
-        const base64Url = token.split(".")[1];
-        if (!base64Url) return null;
-
-        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-        const jsonPayload = decodeURIComponent(
-            atob(base64)
-                .split("")
-                .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
-                .join(""),
-        );
-        return JSON.parse(jsonPayload);
-    } catch {
-        return null;
-    }
-}
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
@@ -84,7 +65,7 @@ export default defineEventHandler(async (event) => {
         }
     }
 
-    const sessionPayload: SessionPayload = {
+    const sessionPayload: AuthSessionPayload = {
         userId: (payload.oid as string) || (payload.sub as string) || "",
         email:
             (payload.preferred_username as string) ||
@@ -94,6 +75,7 @@ export default defineEventHandler(async (event) => {
         roles: (payload.roles as string[]) || [],
         apiAccessToken,
         apiAccessTokenExpiresAt,
+        refreshToken: (tokenResponse as unknown as { refreshToken?: string }).refreshToken,
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + COOKIE_MAX_AGE,
     };

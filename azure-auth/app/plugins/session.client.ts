@@ -1,8 +1,7 @@
 import { defineNuxtPlugin } from "#imports";
-import type { Session } from "../types/session";
 
 export default defineNuxtPlugin(async () => {
-    const session = useState<Session | null>(
+    const session = useState<AuthSession | null>(
         "auth:session",
         () => null,
     );
@@ -11,7 +10,7 @@ export default defineNuxtPlugin(async () => {
         const headers = import.meta.server ? useRequestHeaders(["cookie"]) : {};
 
         const response =
-            await $fetch<Session>(
+            await $fetch<AuthSession>(
                 "/api/auth/session",
                 {
                     headers

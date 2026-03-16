@@ -1,4 +1,4 @@
-export interface SessionUser {
+export interface AuthSessionUser {
     id: string;
     name: string;
     email: string;
@@ -6,20 +6,22 @@ export interface SessionUser {
     roles: string[];
 }
 
-export interface Session {
-    user: SessionUser;
+export interface AuthSession {
+    user: AuthSessionUser;
     apiAccessToken?: string;
     apiAccessTokenExpiresAt?: number;
     idToken?: string;
+    refreshToken?: string;
 }
 
-export interface SessionPayload {
+export interface AuthSessionPayload {
     userId: string;
     email: string;
     name: string;
     roles: string[];
     apiAccessToken?: string;
     apiAccessTokenExpiresAt?: number;
+    refreshToken?: string;
     iat: number;
     exp: number;
     [key: string]: unknown;
