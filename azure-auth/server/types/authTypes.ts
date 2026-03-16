@@ -1,7 +1,3 @@
-import type { Session, SessionPayload } from "../../app/types/session";
-
-export interface ExtendedSession extends Session {
+export interface ExtendedSession extends AuthSession {
     error?: string;
 }
-
-export type { Session, SessionPayload };

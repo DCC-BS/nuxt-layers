@@ -9,7 +9,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
 
     const headers = import.meta.server ? useRequestHeaders(["cookie"]) : {};
-    const data = await $fetch<Session>("/api/auth/session", {
+    const data = await $fetch<AuthSession>("/api/auth/session", {
         headers,
     });
 

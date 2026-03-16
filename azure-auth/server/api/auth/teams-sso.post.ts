@@ -1,8 +1,6 @@
-import { ConfidentialClientApplication } from "@azure/msal-node";
 import { createError, defineEventHandler, readBody, setCookie } from "h3";
 import { SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
-import type { Session, SessionPayload } from "../../../app/types/session";
 
 const SESSION_COOKIE_NAME = "auth_session";
 const COOKIE_MAX_AGE = 60 * 60 * 24;
@@ -11,37 +9,7 @@ interface TeamsSsoRequest {
     token: string;
 }
 
-function decodeJwtPayload(token: string): Record<string, unknown> | null {
-    try {
-        const base64Url = token.split(".")[1];
-        if (!base64Url) return null;
-
-        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-        const jsonPayload = decodeURIComponent(
-            atob(base64)
-                .split("")
-                .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
-                .join(""),
-        );
-        return JSON.parse(jsonPayload);
-    } catch {
-        return null;
-    }
-}
-
-async function createMsalClient() {
-    const config = useRuntimeConfig().azureAuth;
-
-    return new ConfidentialClientApplication({
-        auth: {
-            clientId: config.clientId,
-            clientSecret: config.clientSecret,
-            authority: `https://login.microsoftonline.com/${config.tenantId}`,
-        },
-    });
-}
-
-export default defineEventHandler(async (event): Promise<Session> => {
+export default defineEventHandler(async (event): Promise<AuthSession> => {
     const body = await readBody<TeamsSsoRequest>(event);
 
     if (!body?.token) {
@@ -49,7 +17,7 @@ export default defineEventHandler(async (event): Promise<Session> => {
     }
 
     const config = useRuntimeConfig().azureAuth;
-    const msalClient = await createMsalClient();
+    const msalClient = getMsalClient();
 
     const oboResponse = await msalClient.acquireTokenOnBehalfOf({
         oboAssertion: body.token,
@@ -71,7 +39,7 @@ export default defineEventHandler(async (event): Promise<Session> => {
         });
     }
 
-    const sessionPayload: SessionPayload = {
+    const sessionPayload: AuthSessionPayload = {
         userId: (decoded.oid as string) || (decoded.sub as string) || "",
         email:
             (decoded.preferred_username as string) ||
