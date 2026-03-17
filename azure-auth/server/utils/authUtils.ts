@@ -2,7 +2,11 @@ import { createError, getCookie, type H3Event } from "h3";
 import { jwtVerify, SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
 
+import { tokenPayloadSchema, TokenPayload, AuthSessionPayload, AuthSession } from "../types/authTypes";
+import { z } from "zod";
+
 export const SESSION_COOKIE_NAME = "auth_session";
+export const MS_TEAMS_FLAG_COOKIE_NAME = "auth_ms_treams";
 const TOKEN_EXPIRY_BUFFER_SECONDS = 60;
 export const COOKIE_MAX_AGE = 60 * 60 * 24;
 
@@ -24,6 +28,7 @@ export async function getServerSession(
     const cookie = getCookie(event, SESSION_COOKIE_NAME);
 
     if (!cookie) {
+        console.log("No session cookie found");
         return null;
     }
 
@@ -32,8 +37,10 @@ export async function getServerSession(
         const secret = new TextEncoder().encode(config.azureAuth.secret);
 
         const { payload } = await jwtVerify<AuthSessionPayload>(cookie, secret);
-        const { apiAccessToken, refreshToken, apiAccessTokenExpiresAt } =
-            await getOrRefreshAccessToken(event, payload);
+
+        console.log("ACCCOUNT", payload.account);
+
+        const result = await getOrRefreshAccessToken(event, payload);
 
         return {
             user: {
@@ -42,11 +49,10 @@ export async function getServerSession(
                 name: payload.name,
                 roles: payload.roles,
             },
-            apiAccessToken: apiAccessToken,
-            apiAccessTokenExpiresAt: apiAccessTokenExpiresAt,
-            refreshToken: refreshToken,
+            apiAccessToken: result.accessToken,
         };
-    } catch {
+    } catch (error) {
+        console.error("Error verifying session cookie: ", error);
         return null;
     }
 }
@@ -55,54 +61,63 @@ export async function getOrRefreshAccessToken(
     event: H3Event,
     payload: AuthSessionPayload,
 ) {
-    const config = useRuntimeConfig();
-    const secret = new TextEncoder().encode(config.azureAuth.secret);
+    const msalClient = getMsalClient();
 
-    let apiAccessToken = payload.apiAccessToken;
-    let apiAccessTokenExpiresAt = payload.apiAccessTokenExpiresAt;
-    let refreshToken = payload.refreshToken;
+    return await msalClient.acquireTokenSilent({
+        account: payload.account,
+        scopes: getScopes(),
+    });
 
-    if (isTokenExpired(apiAccessTokenExpiresAt) && refreshToken) {
-        console.log("API access token expired, attempting to refresh...");
-        const refreshed = await refreshAccessToken(refreshToken);
+    // const config = useRuntimeConfig();
+    // const secret = new TextEncoder().encode(config.azureAuth.secret);
 
-        if (refreshed) {
-            apiAccessToken = refreshed.accessToken;
-            apiAccessTokenExpiresAt = refreshed.expiresAt;
-            if (refreshed.refreshToken) {
-                refreshToken = refreshed.refreshToken;
-            }
+    // let apiAccessToken = payload.apiAccessToken;
+    // let apiAccessTokenExpiresAt = payload.apiAccessTokenExpiresAt;
+    // let refreshToken = payload.refreshToken;
 
-            const updatedPayload: AuthSessionPayload = {
-                ...payload,
-                apiAccessToken,
-                apiAccessTokenExpiresAt,
-                refreshToken,
-                iat: Math.floor(Date.now() / 1000),
-                exp: Math.floor(Date.now() / 1000) + COOKIE_MAX_AGE,
-            };
+    // if (isTokenExpired(apiAccessTokenExpiresAt) && refreshToken) {
+    //     console.log("API access token expired, attempting to refresh...");
+    //     const refreshed = await refreshAccessToken(refreshToken);
 
-            const newToken = await new SignJWT(updatedPayload)
-                .setProtectedHeader({ alg: "HS256" })
-                .setIssuedAt()
-                .setExpirationTime(`${COOKIE_MAX_AGE}s`)
-                .sign(secret);
+    //     if (refreshed) {
+    //         apiAccessToken = refreshed.accessToken;
+    //         apiAccessTokenExpiresAt = refreshed.expiresAt;
+    //         if (refreshed.refreshToken) {
+    //             refreshToken = refreshed.refreshToken;
+    //         }
 
-            setCookie(event, SESSION_COOKIE_NAME, newToken, {
-                httpOnly: true,
-                secure: true,
-                sameSite: "lax",
-                path: "/",
-                maxAge: COOKIE_MAX_AGE,
-            });
-        }
-    }
+    //         const updatedPayload: AuthSessionPayload = {
+    //             ...payload,
+    //             apiAccessToken,
+    //             apiAccessTokenExpiresAt,
+    //             refreshToken,
+    //             iat: Math.floor(Date.now() / 1000),
+    //             exp: Math.floor(Date.now() / 1000) + COOKIE_MAX_AGE,
+    //         };
 
-    return {
-        apiAccessToken,
-        refreshToken,
-        apiAccessTokenExpiresAt,
-    };
+    //         const newToken = await new SignJWT(updatedPayload)
+    //             .setProtectedHeader({ alg: "HS256" })
+    //             .setIssuedAt()
+    //             .setExpirationTime(`${COOKIE_MAX_AGE}s`)
+    //             .sign(secret);
+
+    //         const isMsTeams = getCookie(event, MS_TEAMS_FLAG_COOKIE_NAME)?.trim().toLocaleLowerCase() === "true";
+
+    //         setCookie(event, SESSION_COOKIE_NAME, newToken, {
+    //             httpOnly: true,
+    //             secure: true,
+    //             sameSite: isMsTeams ? "none" : "lax",
+    //             path: "/",
+    //             maxAge: COOKIE_MAX_AGE,
+    //         });
+    //     }
+    // }
+
+    // return {
+    //     apiAccessToken,
+    //     refreshToken,
+    //     apiAccessTokenExpiresAt,
+    // };
 }
 
 export async function getAuthContext(event: H3Event) {
@@ -155,7 +170,7 @@ export async function getCurrentUser(event: H3Event) {
 
 export function decodeJwtPayload(
     token: string,
-): Record<string, unknown> | null {
+): TokenPayload | null {
     try {
         const base64Url = token.split(".")[1];
         if (!base64Url) return null;
@@ -167,8 +182,15 @@ export function decodeJwtPayload(
                 .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
                 .join(""),
         );
-        return JSON.parse(jsonPayload);
-    } catch {
+
+        return tokenPayloadSchema.parse(JSON.parse(jsonPayload));
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            console.error("JWT payload validation error: \n", z.prettifyError(error));
+        } else {
+            console.error("Error decoding JWT payload: \n", String(error));
+        }
+
         return null;
     }
 }

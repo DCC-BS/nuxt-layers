@@ -8,6 +8,7 @@ import {
 import { SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
 import { COOKIE_MAX_AGE, SESSION_COOKIE_NAME } from "../../../utils/authUtils";
+import { authSessionPayloadSchema } from "../../../types/authTypes";
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
@@ -48,32 +49,40 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    let apiAccessToken: string | undefined;
-    let apiAccessTokenExpiresAt: number | undefined;
-
-    if (tokenResponse.accessToken) {
-        apiAccessToken = tokenResponse.accessToken;
-        const decoded = decodeJwtPayload(tokenResponse.accessToken);
-        if (decoded?.exp && typeof decoded.exp === "number") {
-            apiAccessTokenExpiresAt = decoded.exp;
-        }
+    if (!tokenResponse.accessToken) {
+        throw createError({
+            statusCode: 401,
+            statusMessage: "Failed to acquire API access token",
+        })
     }
 
-    const sessionPayload: AuthSessionPayload = {
-        userId: (payload.oid as string) || (payload.sub as string) || "",
+    const apiAccessToken = tokenResponse.accessToken;
+    const decoded = decodeJwtPayload(tokenResponse.accessToken);
+
+    if(!decoded) {
+        throw createError({
+            statusCode: 401,
+            statusMessage: "Invalid API access token",
+        })
+    }
+
+    let apiAccessTokenExpiresAt = decoded.exp;
+
+    const sessionPayload = authSessionPayloadSchema.parse({
+        userId: payload.oid,
         email:
-            (payload.preferred_username as string) ||
-            (payload.email as string) ||
+            payload.email ||
+            payload.preferred_username ||
             "",
-        name: (payload.name as string) || "",
-        roles: (payload.roles as string[]) || [],
+        name: payload.name,
+        roles: payload.roles || [],
         apiAccessToken,
         apiAccessTokenExpiresAt,
-        refreshToken: (tokenResponse as unknown as { refreshToken?: string })
-            .refreshToken,
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + COOKIE_MAX_AGE,
-    };
+        inMsTeams: false,
+        account: tokenResponse.account,
+    });
 
     const secret = new TextEncoder().encode(config.secret);
     const token = await new SignJWT(sessionPayload)

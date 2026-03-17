@@ -4,26 +4,26 @@ import type { UseAppAuthReturns } from "#layers/auth/app/types/composableTypes";
 const sessionKey = "auth:session";
 
 export function useAppAuth(): UseAppAuthReturns {
-    const session = useState<AuthSession | undefined>(
+    const user = useState<AuthSessionUser | undefined>(
         sessionKey,
         () => undefined,
     );
 
     const data = computed<AuthData | undefined>(() => {
-        if (!session.value?.user) {
+        if (!user.value) {
             return undefined;
         }
 
         return {
             user: {
-                image: session.value.user.image || "",
-                name: session.value.user.name || "",
-                email: session.value.user.email || "",
+                image: user.value?.image ?? "",
+                name: user.value?.name ?? "",
+                email: user.value?.email ?? "",
             },
         };
     });
 
-    const isAuthEnabled = computed(() => !!session.value);
+    const isAuthEnabled = computed(() => !!user.value);
 
     async function clearServerSession(): Promise<void> {
         try {
@@ -33,7 +33,7 @@ export function useAppAuth(): UseAppAuthReturns {
         } catch {
             // Ignore errors during logout
         }
-        session.value = undefined;
+        user.value = undefined;
     }
 
     async function signIn(): Promise<void> {
