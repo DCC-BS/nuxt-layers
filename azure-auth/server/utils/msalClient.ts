@@ -23,6 +23,7 @@ export function getMsalClient(): ConfidentialClientApplication {
 
 export function getAuthConfig() {
     const config = useRuntimeConfig().azureAuth;
+
     return {
         clientId: config.clientId,
         tenantId: config.tenantId,

@@ -5,14 +5,7 @@ export default defineEventHandler(async (event) => {
     const msalClient = getMsalClient();
     const authConfig = getAuthConfig();
     const query = getQuery(event);
-
-    const scopes = [
-        "openid",
-        "profile",
-        "email",
-        "offline_access",
-        `api://${authConfig.apiClientId}/user_impersonation`,
-    ];
+    const scopes = getScopes();
 
     const authCodeUrlParameters = {
         scopes,
