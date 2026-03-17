@@ -1,7 +1,7 @@
 import { createError, defineEventHandler, readBody, setCookie } from "h3";
 import { SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
-import { COOKIE_MAX_AGE, SESSION_COOKIE_NAME } from "../../utils/authUtils";
+import { COOKIE_MAX_AGE, MS_TEAMS_FLAG_COOKIE_NAME, SESSION_COOKIE_NAME } from "../../utils/authUtils";
 
 interface TeamsSsoRequest {
     token: string;
@@ -52,6 +52,7 @@ export default defineEventHandler(async (event): Promise<AuthSession> => {
                 : Math.floor(Date.now() / 1000) + 3600,
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + COOKIE_MAX_AGE,
+        inMsTeams: true,
     };
 
     const secret = new TextEncoder().encode(config.secret);
@@ -67,6 +68,14 @@ export default defineEventHandler(async (event): Promise<AuthSession> => {
         sameSite: "none",
         path: "/",
         maxAge: COOKIE_MAX_AGE,
+    });
+
+    setCookie(event, MS_TEAMS_FLAG_COOKIE_NAME, "true", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: "/",
+        maxAge: COOKIE_MAX_AGE
     });
 
     return {

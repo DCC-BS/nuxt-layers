@@ -1,21 +1,17 @@
 export default defineNuxtRouteMiddleware(async (to) => {
     if (to.meta.public === true) return;
 
-    if (process.client) {
-        const inFrame = window.parent !== window;
-        if (inFrame) {
+    const headers = import.meta.server ? useRequestHeaders(["cookie"]) : {};
+
+    try {
+        const data = await $fetch("/api/auth/me", {
+            headers,
+        });
+
+        if (data) {
             return;
         }
-    }
-
-    const headers = import.meta.server ? useRequestHeaders(["cookie"]) : {};
-    const data = await $fetch<AuthSession>("/api/auth/session", {
-        headers,
-    });
-
-    if (data?.user) {
-        return;
-    }
+    } catch {}
 
     return navigateTo("/auth/signIn");
 });
