@@ -1,7 +1,7 @@
 import { createError, defineEventHandler, readBody, setCookie } from "h3";
 import { SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
-import { COOKIE_MAX_AGE, SESSION_COOKIE_NAME } from "#imports";
+import { COOKIE_MAX_AGE, SESSION_COOKIE_NAME } from "../../utils/authUtils";
 
 interface TeamsSsoRequest {
     token: string;
