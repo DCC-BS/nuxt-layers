@@ -7,9 +7,7 @@ import {
 } from "h3";
 import { SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
-
-const SESSION_COOKIE_NAME = "auth_session";
-const COOKIE_MAX_AGE = 60 * 60 * 24;
+import { COOKIE_MAX_AGE, SESSION_COOKIE_NAME} from "../../../utils/authUtils"
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
@@ -27,15 +25,11 @@ export default defineEventHandler(async (event) => {
     const authConfig = getAuthConfig();
     const config = useRuntimeConfig().azureAuth;
 
+    const scopes = getScopes();
+
     const tokenResponse = await msalClient.acquireTokenByCode({
         code,
-        scopes: [
-            "openid",
-            "profile",
-            "email",
-            "offline_access",
-            `api://${authConfig.apiClientId}/user_impersonation`,
-        ],
+        scopes: scopes,
         redirectUri: authConfig.redirectUri,
     });
 
@@ -54,6 +48,8 @@ export default defineEventHandler(async (event) => {
         });
     }
 
+    console.log("payload", payload);
+
     let apiAccessToken: string | undefined;
     let apiAccessTokenExpiresAt: number | undefined;
 
@@ -63,6 +59,7 @@ export default defineEventHandler(async (event) => {
         if (decoded?.exp && typeof decoded.exp === "number") {
             apiAccessTokenExpiresAt = decoded.exp;
         }
+        console.log("decoded access token", decoded);
     }
 
     const sessionPayload: AuthSessionPayload = {

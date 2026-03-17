@@ -1,15 +1,29 @@
-import { createError, getCookie, type H3Event } from "h3";
+import { createError, getCookie, H3Event } from "h3";
 import { jwtVerify, SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
 
-const SESSION_COOKIE_NAME = "auth_session";
+export const SESSION_COOKIE_NAME = "auth_session";
 const TOKEN_EXPIRY_BUFFER_SECONDS = 60;
-const COOKIE_MAX_AGE = 60 * 60 * 24;
+export const COOKIE_MAX_AGE = 60 * 60 * 24;
+
+export function getScopes() {
+    const authConfig = getAuthConfig();
+    return [
+        "openid",
+        "profile",
+        "email",
+        "offline_access",
+        "User.Read",
+        `api://${authConfig.apiClientId}/user_impersonation`,
+    ];
+}
 
 export async function getServerSession(
     event: H3Event,
 ): Promise<AuthSession | null> {
     const cookie = getCookie(event, SESSION_COOKIE_NAME);
+
+    console.log("Cookie", cookie);
 
     if (!cookie) {
         return null;
@@ -160,17 +174,11 @@ export async function refreshAccessToken(
 ): Promise<{ accessToken: string; expiresAt: number; refreshToken?: string } | null> {
     try {
         const msalClient = getMsalClient();
-        const authConfig = getAuthConfig();
+        const scopes = getScopes();
 
         const response = await msalClient.acquireTokenByRefreshToken({
             refreshToken,
-            scopes: [
-                "openid",
-                "profile",
-                "email",
-                "offline_access",
-                `api://${authConfig.apiClientId}/user_impersonation`,
-            ],
+            scopes: scopes,
         });
 
         if (!response?.accessToken) {

@@ -1,9 +1,7 @@
 import { createError, defineEventHandler, readBody, setCookie } from "h3";
 import { SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
-
-const SESSION_COOKIE_NAME = "auth_session";
-const COOKIE_MAX_AGE = 60 * 60 * 24;
+import { COOKIE_MAX_AGE, SESSION_COOKIE_NAME } from "#imports";
 
 interface TeamsSsoRequest {
     token: string;
@@ -66,10 +64,12 @@ export default defineEventHandler(async (event): Promise<AuthSession> => {
     setCookie(event, SESSION_COOKIE_NAME, token, {
         httpOnly: true,
         secure: true,
-        sameSite: "lax",
+        sameSite: "none",
         path: "/",
         maxAge: COOKIE_MAX_AGE,
     });
+
+    console.log("Cookie set");
 
     return {
         user: {
