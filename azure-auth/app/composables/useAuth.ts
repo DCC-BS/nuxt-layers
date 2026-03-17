@@ -4,7 +4,10 @@ import type { UseAppAuthReturns } from "#layers/auth/app/types/composableTypes";
 const sessionKey = "auth:session";
 
 export function useAppAuth(): UseAppAuthReturns {
-    const session = useState<AuthSession | undefined>(sessionKey, () => undefined);
+    const session = useState<AuthSession | undefined>(
+        sessionKey,
+        () => undefined,
+    );
 
     const data = computed<AuthData | undefined>(() => {
         if (!session.value?.user) {

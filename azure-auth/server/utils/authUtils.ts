@@ -1,4 +1,4 @@
-import { createError, getCookie, H3Event } from "h3";
+import { createError, getCookie, type H3Event } from "h3";
 import { jwtVerify, SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
 
@@ -23,8 +23,6 @@ export async function getServerSession(
 ): Promise<AuthSession | null> {
     const cookie = getCookie(event, SESSION_COOKIE_NAME);
 
-    console.log("Cookie", cookie);
-
     if (!cookie) {
         return null;
     }
@@ -34,7 +32,8 @@ export async function getServerSession(
         const secret = new TextEncoder().encode(config.azureAuth.secret);
 
         const { payload } = await jwtVerify<AuthSessionPayload>(cookie, secret);
-        const { apiAccessToken, refreshToken, apiAccessTokenExpiresAt } = await getOrRefreshAccessToken(event, payload);
+        const { apiAccessToken, refreshToken, apiAccessTokenExpiresAt } =
+            await getOrRefreshAccessToken(event, payload);
 
         return {
             user: {
@@ -52,7 +51,10 @@ export async function getServerSession(
     }
 }
 
-export async function getOrRefreshAccessToken(event: H3Event, payload: AuthSessionPayload) {
+export async function getOrRefreshAccessToken(
+    event: H3Event,
+    payload: AuthSessionPayload,
+) {
     const config = useRuntimeConfig();
     const secret = new TextEncoder().encode(config.azureAuth.secret);
 
@@ -99,8 +101,8 @@ export async function getOrRefreshAccessToken(event: H3Event, payload: AuthSessi
     return {
         apiAccessToken,
         refreshToken,
-        apiAccessTokenExpiresAt
-    }
+        apiAccessTokenExpiresAt,
+    };
 }
 
 export async function getAuthContext(event: H3Event) {
@@ -151,7 +153,9 @@ export async function getCurrentUser(event: H3Event) {
     };
 }
 
-export function decodeJwtPayload(token: string): Record<string, unknown> | null {
+export function decodeJwtPayload(
+    token: string,
+): Record<string, unknown> | null {
     try {
         const base64Url = token.split(".")[1];
         if (!base64Url) return null;
@@ -169,9 +173,11 @@ export function decodeJwtPayload(token: string): Record<string, unknown> | null 
     }
 }
 
-export async function refreshAccessToken(
-    refreshToken: string,
-): Promise<{ accessToken: string; expiresAt: number; refreshToken?: string } | null> {
+export async function refreshAccessToken(refreshToken: string): Promise<{
+    accessToken: string;
+    expiresAt: number;
+    refreshToken?: string;
+} | null> {
     try {
         const msalClient = getMsalClient();
         const scopes = getScopes();
@@ -194,7 +200,8 @@ export async function refreshAccessToken(
         return {
             accessToken: response.accessToken,
             expiresAt,
-            refreshToken: (response as unknown as { refreshToken?: string }).refreshToken,
+            refreshToken: (response as unknown as { refreshToken?: string })
+                .refreshToken,
         };
     } catch {
         return null;

@@ -58,13 +58,10 @@ async function signInWithTeams() {
             () => null,
         );
 
-        const response = await $fetch<AuthSession>(
-            "/api/auth/teams-sso",
-            {
-                method: "POST",
-                body: { token },
-            },
-        );
+        const response = await $fetch<AuthSession>("/api/auth/teams-sso", {
+            method: "POST",
+            body: { token },
+        });
 
         session.value = response;
         await navigateTo("/");

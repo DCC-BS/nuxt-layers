@@ -9,25 +9,19 @@ export default defineNuxtPlugin(async () => {
     try {
         const headers = import.meta.server ? useRequestHeaders(["cookie"]) : {};
 
-        const response =
-            await $fetch<AuthSession>(
-                "/api/auth/session",
-                {
-                    headers
-                }
-            );
+        const response = await $fetch<AuthSession>("/api/auth/session", {
+            headers,
+        });
         session.value = response;
         session.value.user.image = await getImage();
     } catch (e) {
-        console.log("No active session found", e
-
-        );
+        console.log("No active session found", e);
         session.value = undefined;
     }
 });
 
 async function getImage() {
-    try{
+    try {
         const response = await fetch("/api/auth/user/image");
         if (response.ok) {
             const blob = await response.blob();

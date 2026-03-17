@@ -7,7 +7,7 @@ import {
 } from "h3";
 import { SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
-import { COOKIE_MAX_AGE, SESSION_COOKIE_NAME} from "../../../utils/authUtils"
+import { COOKIE_MAX_AGE, SESSION_COOKIE_NAME } from "../../../utils/authUtils";
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
@@ -48,8 +48,6 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    console.log("payload", payload);
-
     let apiAccessToken: string | undefined;
     let apiAccessTokenExpiresAt: number | undefined;
 
@@ -59,7 +57,6 @@ export default defineEventHandler(async (event) => {
         if (decoded?.exp && typeof decoded.exp === "number") {
             apiAccessTokenExpiresAt = decoded.exp;
         }
-        console.log("decoded access token", decoded);
     }
 
     const sessionPayload: AuthSessionPayload = {
@@ -72,7 +69,8 @@ export default defineEventHandler(async (event) => {
         roles: (payload.roles as string[]) || [],
         apiAccessToken,
         apiAccessTokenExpiresAt,
-        refreshToken: (tokenResponse as unknown as { refreshToken?: string }).refreshToken,
+        refreshToken: (tokenResponse as unknown as { refreshToken?: string })
+            .refreshToken,
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + COOKIE_MAX_AGE,
     };

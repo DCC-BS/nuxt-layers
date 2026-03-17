@@ -4,12 +4,10 @@ import { useAppAuth } from "#imports";
 const { data, signOut } = useAppAuth();
 const pingResponse = ref<string>();
 
-
 async function ping() {
     const response = await fetch("/api/ping");
     pingResponse.value = await response.text();
 }
-
 </script>
 
 <template>
