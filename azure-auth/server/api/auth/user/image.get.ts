@@ -11,11 +11,14 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const imageUrl = await fetch("https://graph.microsoft.com/v1.0/me/photo/$value", {
-        headers: {
-            Authorization: `Bearer ${apiAccessToken}`,
+    const imageUrl = await fetch(
+        "https://graph.microsoft.com/v1.0/me/photo/$value",
+        {
+            headers: {
+                Authorization: `Bearer ${apiAccessToken}`,
+            },
         },
-    });
+    );
 
     if (!imageUrl) {
         throw createError({

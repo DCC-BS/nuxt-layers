@@ -69,8 +69,6 @@ export default defineEventHandler(async (event): Promise<AuthSession> => {
         maxAge: COOKIE_MAX_AGE,
     });
 
-    console.log("Cookie set");
-
     return {
         user: {
             id: sessionPayload.userId,
