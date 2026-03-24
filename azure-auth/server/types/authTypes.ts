@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { AccountInfo } from '@azure/msal-node';
+import type { AccountInfo } from "@azure/msal-node";
+import { z } from "zod";
 
 export interface ExtendedSession extends AuthSession {
     error?: string;
@@ -29,20 +29,15 @@ export const authSessionPayloadSchema = z.object({
     email: z.string(),
     name: z.string(),
     roles: z.array(z.string()),
-    apiAccessToken: z.string(),
-    apiAccessTokenExpiresAt: z.number(),
-    iat: z.number(),
-    exp: z.number(),
     inMsTeams: z.boolean(),
     account: z.any(),
 });
 
-export type AuthSessionPayload = z.infer<typeof authSessionPayloadSchema> & { account: AccountInfo };
+export type AuthSessionPayload = z.infer<typeof authSessionPayloadSchema> & {
+    account: AccountInfo;
+};
 
 export interface AuthSession {
     user: AuthSessionUser;
     apiAccessToken?: string;
-    // apiAccessTokenExpiresAt?: number;
-    // idToken?: string;
-    // refreshToken?: string;
 }
