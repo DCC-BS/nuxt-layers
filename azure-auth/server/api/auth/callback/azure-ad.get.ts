@@ -29,6 +29,8 @@ export default defineEventHandler(async (event) => {
 
     const scopes = getScopes();
 
+    console.log("scopes", scopes);
+
     const tokenResponse = await msalClient.acquireTokenByCode({
         code,
         scopes: scopes,
