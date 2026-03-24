@@ -42,6 +42,7 @@ export async function getServerSession(
 
         const { payload } = await jwtVerify<AuthSessionPayload>(cookie, secret);
         const result = await getOrRefreshAccessToken(payload);
+        console.log("Access token refreshed: ", result.scopes);
 
         return {
             user: {
@@ -62,8 +63,6 @@ export async function getOrRefreshAccessToken(payload: AuthSessionPayload) {
     const msalClient = getMsalClient();
 
     const scopes = getScopes();
-
-    console.log("scopes: ", scopes);
 
     return await msalClient.acquireTokenSilent({
         account: payload.account,
