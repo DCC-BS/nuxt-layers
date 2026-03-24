@@ -1,13 +1,19 @@
 import { createError, defineEventHandler, readBody, setCookie } from "h3";
 import { SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
-import { COOKIE_MAX_AGE, MS_TEAMS_FLAG_COOKIE_NAME, SESSION_COOKIE_NAME } from "../../utils/authUtils";
+import type { AuthSessionUser } from "#layers/azure-auth/shared/types/session";
+import { authSessionPayloadSchema } from "../../types/authTypes";
+import {
+    COOKIE_MAX_AGE,
+    MS_TEAMS_FLAG_COOKIE_NAME,
+    SESSION_COOKIE_NAME,
+} from "../../utils/authUtils";
 
 interface TeamsSsoRequest {
     token: string;
 }
 
-export default defineEventHandler(async (event): Promise<AuthSession> => {
+export default defineEventHandler(async (event) => {
     const body = await readBody<TeamsSsoRequest>(event);
 
     if (!body?.token) {
@@ -29,6 +35,14 @@ export default defineEventHandler(async (event): Promise<AuthSession> => {
         });
     }
 
+    if (!oboResponse.account) {
+        throw createError({
+            statusCode: 401,
+            statusMessage:
+                "Failed to retrieve account information from OBO response",
+        });
+    }
+
     const decoded = decodeJwtPayload(oboResponse.accessToken);
     if (!decoded) {
         throw createError({
@@ -37,7 +51,7 @@ export default defineEventHandler(async (event): Promise<AuthSession> => {
         });
     }
 
-    const sessionPayload: AuthSessionPayload = {
+    const sessionPayload = authSessionPayloadSchema.parse({
         userId: (decoded.oid as string) || (decoded.sub as string) || "",
         email:
             (decoded.preferred_username as string) ||
@@ -45,15 +59,9 @@ export default defineEventHandler(async (event): Promise<AuthSession> => {
             "",
         name: (decoded.name as string) || "",
         roles: (decoded.roles as string[]) || [],
-        apiAccessToken: oboResponse.accessToken,
-        apiAccessTokenExpiresAt:
-            typeof decoded.exp === "number"
-                ? decoded.exp
-                : Math.floor(Date.now() / 1000) + 3600,
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + COOKIE_MAX_AGE,
+        account: oboResponse.account,
         inMsTeams: true,
-    };
+    });
 
     const secret = new TextEncoder().encode(config.secret);
     const token = await new SignJWT(sessionPayload)
@@ -75,17 +83,13 @@ export default defineEventHandler(async (event): Promise<AuthSession> => {
         secure: true,
         sameSite: "none",
         path: "/",
-        maxAge: COOKIE_MAX_AGE
+        maxAge: COOKIE_MAX_AGE,
     });
 
     return {
-        user: {
-            id: sessionPayload.userId,
-            email: sessionPayload.email,
-            name: sessionPayload.name,
-            roles: sessionPayload.roles,
-        },
-        apiAccessToken: oboResponse.accessToken,
-        apiAccessTokenExpiresAt: sessionPayload.apiAccessTokenExpiresAt,
-    };
+        id: sessionPayload.userId,
+        email: sessionPayload.email,
+        name: sessionPayload.name,
+        roles: sessionPayload.roles,
+    } as AuthSessionUser;
 });

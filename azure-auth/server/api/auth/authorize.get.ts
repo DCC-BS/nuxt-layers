@@ -1,6 +1,6 @@
+import type { AuthorizationUrlRequest } from "@azure/msal-node";
 import { defineEventHandler, getQuery, sendRedirect } from "h3";
 import { getAuthConfig, getMsalClient } from "../../utils/msalClient";
-import { AuthorizationUrlRequest } from "@azure/msal-node";
 
 export default defineEventHandler(async (event) => {
     const msalClient = getMsalClient();

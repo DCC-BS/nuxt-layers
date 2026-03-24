@@ -53,12 +53,12 @@ async function signInWithTeams() {
         await microsoftTeams.app.initialize();
         const token = await microsoftTeams.authentication.getAuthToken();
 
-        const session = useState<AuthSession | null>(
+        const session = useState<AuthSessionUser | null>(
             "auth:session",
             () => null,
         );
 
-        const response = await $fetch<AuthSession>("/api/auth/teams-sso", {
+        const response = await $fetch<AuthSessionUser>("/api/auth/teams-sso", {
             method: "POST",
             body: { token },
         });
@@ -67,6 +67,7 @@ async function signInWithTeams() {
         await navigateTo("/");
         return true;
     } catch (e) {
+        console.log("Teams SSO sign-in failed, falling back to Azure AD", e);
         isLoading.value = false;
         return false;
     }

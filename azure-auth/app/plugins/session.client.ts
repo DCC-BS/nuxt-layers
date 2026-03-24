@@ -1,4 +1,4 @@
-import { defineNuxtPlugin, type AuthSessionUser } from "#imports";
+import { type AuthSessionUser, defineNuxtPlugin } from "#imports";
 
 export default defineNuxtPlugin(async () => {
     const session = useState<AuthSessionUser | undefined>(

@@ -1,3 +1,4 @@
+import type { AccountInfo } from "@azure/msal-node";
 import {
     createError,
     defineEventHandler,
@@ -7,8 +8,8 @@ import {
 } from "h3";
 import { SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
-import { COOKIE_MAX_AGE, SESSION_COOKIE_NAME } from "../../../utils/authUtils";
 import { authSessionPayloadSchema } from "../../../types/authTypes";
+import { COOKIE_MAX_AGE, SESSION_COOKIE_NAME } from "../../../utils/authUtils";
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
@@ -53,35 +54,30 @@ export default defineEventHandler(async (event) => {
         throw createError({
             statusCode: 401,
             statusMessage: "Failed to acquire API access token",
-        })
+        });
     }
 
-    const apiAccessToken = tokenResponse.accessToken;
-    const decoded = decodeJwtPayload(tokenResponse.accessToken);
+    const account = tokenResponse.account;
 
-    if(!decoded) {
+    if (!account) {
         throw createError({
             statusCode: 401,
-            statusMessage: "Invalid API access token",
-        })
+            statusMessage: "Failed to retrieve account information",
+        });
     }
-
-    let apiAccessTokenExpiresAt = decoded.exp;
 
     const sessionPayload = authSessionPayloadSchema.parse({
         userId: payload.oid,
-        email:
-            payload.email ||
-            payload.preferred_username ||
-            "",
+        email: payload.email || payload.preferred_username || "",
         name: payload.name,
         roles: payload.roles || [],
-        apiAccessToken,
-        apiAccessTokenExpiresAt,
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + COOKIE_MAX_AGE,
         inMsTeams: false,
-        account: tokenResponse.account,
+        account: {
+            environment: account.environment,
+            homeAccountId: account.homeAccountId,
+            tenantId: account.tenantId,
+            username: account.username,
+        } as AccountInfo,
     });
 
     const secret = new TextEncoder().encode(config.secret);

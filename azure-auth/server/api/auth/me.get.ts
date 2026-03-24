@@ -1,5 +1,5 @@
-import { AuthSessionUser } from "#layers/azure-auth/shared/types/session";
 import { defineEventHandler } from "h3";
+import type { AuthSessionUser } from "#layers/azure-auth/shared/types/session";
 
 export default defineEventHandler(async (event) => {
     const logger = getEventLogger(event);
