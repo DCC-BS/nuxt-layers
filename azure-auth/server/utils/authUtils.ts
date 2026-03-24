@@ -61,9 +61,13 @@ export async function getServerSession(
 export async function getOrRefreshAccessToken(payload: AuthSessionPayload) {
     const msalClient = getMsalClient();
 
+    const scopes = getScopes();
+
+    console.log("scopes: ", scopes);
+
     return await msalClient.acquireTokenSilent({
         account: payload.account,
-        scopes: getScopes(),
+        scopes: scopes,
     });
 }
 
