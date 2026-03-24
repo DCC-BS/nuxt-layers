@@ -29,13 +29,13 @@ export default defineEventHandler(async (event) => {
 
     const scopes = getScopes();
 
-    console.log("scopes", scopes);
-
     const tokenResponse = await msalClient.acquireTokenByCode({
         code,
         scopes: scopes,
         redirectUri: authConfig.redirectUri,
     });
+
+    console.log("tokenResponse scopes: ", tokenResponse.scopes);
 
     if (!tokenResponse?.idToken) {
         throw createError({
