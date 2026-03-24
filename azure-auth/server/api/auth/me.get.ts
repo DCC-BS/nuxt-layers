@@ -1,5 +1,8 @@
 import { defineEventHandler } from "h3";
 import type { AuthSessionUser } from "#layers/azure-auth/shared/types/session";
+import { AuthSessionPayload } from "../../types/authTypes";
+import { jwtVerify } from "jose/jwt/verify";
+import { getGraphQlAccessToken } from "../../utils/authUtils";
 
 export default defineEventHandler(async (event) => {
     const logger = getEventLogger(event);
@@ -11,12 +14,15 @@ export default defineEventHandler(async (event) => {
 
     let imageUrl: string | undefined;
 
+
     try {
+        const graphQlAccessToken = await getGraphQlAccessToken(event);
+
         const imageBlob = await $fetch<Blob>(
             "https://graph.microsoft.com/v1.0/me/photos/48x48/$value",
             {
                 headers: {
-                    Authorization: `Bearer ${session.apiAccessToken}`,
+                    Authorization: `Bearer ${graphQlAccessToken}`,
                     "Content-Type": "image/jpeg",
                 },
             },
