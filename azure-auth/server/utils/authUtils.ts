@@ -21,9 +21,30 @@ export function getScopes() {
         "profile",
         "email",
         "offline_access",
-        "User.Read",
         `api://${authConfig.apiClientId}/user_impersonation`,
     ];
+}
+
+export async function getGraphQlAccessToken(event: H3Event): Promise<string | null> {
+    const cookie = getCookie(event, SESSION_COOKIE_NAME);
+
+    if (!cookie) {
+        console.log("No session cookie found");
+        return null;
+    }
+
+    try {
+        const config = useRuntimeConfig();
+        const secret = new TextEncoder().encode(config.azureAuth.secret);
+
+        const { payload } = await jwtVerify<AuthSessionPayload>(cookie, secret);
+        const result = await getOrRefreshAccessToken(payload, ["User.Read"]);
+
+        return result.accessToken;
+    } catch (error) {
+        console.error("Error verifying session cookie: ", error);
+        return null;
+    }
 }
 
 export async function getServerSession(
@@ -41,8 +62,7 @@ export async function getServerSession(
         const secret = new TextEncoder().encode(config.azureAuth.secret);
 
         const { payload } = await jwtVerify<AuthSessionPayload>(cookie, secret);
-        const result = await getOrRefreshAccessToken(payload);
-        console.log("Access token refreshed: ", result.scopes);
+        const result = await getOrRefreshAccessToken(payload, getScopes());
 
         return {
             user: {
@@ -59,10 +79,8 @@ export async function getServerSession(
     }
 }
 
-export async function getOrRefreshAccessToken(payload: AuthSessionPayload) {
+export async function getOrRefreshAccessToken(payload: AuthSessionPayload, scopes: string[]) {
     const msalClient = getMsalClient();
-
-    const scopes = getScopes();
 
     return await msalClient.acquireTokenSilent({
         account: payload.account,

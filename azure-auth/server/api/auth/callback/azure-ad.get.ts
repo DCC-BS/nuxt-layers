@@ -35,8 +35,6 @@ export default defineEventHandler(async (event) => {
         redirectUri: authConfig.redirectUri,
     });
 
-    console.log("tokenResponse scopes: ", tokenResponse.scopes);
-
     if (!tokenResponse?.idToken) {
         throw createError({
             statusCode: 401,
