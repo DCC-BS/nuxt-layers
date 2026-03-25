@@ -25,7 +25,9 @@ export function getScopes() {
     ];
 }
 
-export async function getGraphQlAccessToken(event: H3Event): Promise<string | null> {
+export async function getGraphQlAccessToken(
+    event: H3Event,
+): Promise<string | null> {
     const cookie = getCookie(event, SESSION_COOKIE_NAME);
 
     if (!cookie) {
@@ -79,7 +81,10 @@ export async function getServerSession(
     }
 }
 
-export async function getOrRefreshAccessToken(payload: AuthSessionPayload, scopes: string[]) {
+export async function getOrRefreshAccessToken(
+    payload: AuthSessionPayload,
+    scopes: string[],
+) {
     const msalClient = getMsalClient();
 
     return await msalClient.acquireTokenSilent({
