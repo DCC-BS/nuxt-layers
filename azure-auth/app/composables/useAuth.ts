@@ -1,36 +1,54 @@
-import { useAuth as useNuxtAuth } from "#imports";
 import type { AuthData } from "#layers/auth/app/types/authData";
 import type { UseAppAuthReturns } from "#layers/auth/app/types/composableTypes";
 
-export function useAppAuth(): UseAppAuthReturns {
-    const {
-        data: nuxtData,
-        signOut: nuxtSignOut,
-        signIn: nuxtSignIn,
-    } = useNuxtAuth();
+const sessionKey = "auth:session";
 
-    const data = computed<AuthData>(() => {
+export function useAppAuth(): UseAppAuthReturns {
+    const user = useState<AuthSessionUser | undefined>(
+        sessionKey,
+        () => undefined,
+    );
+
+    const data = computed<AuthData | undefined>(() => {
+        if (!user.value) {
+            return undefined;
+        }
+
         return {
             user: {
-                image: nuxtData.value?.user?.image || "",
-                name: nuxtData.value?.user?.name || "",
-                email: nuxtData.value?.user?.email || "",
+                image: user.value?.image ?? "",
+                name: user.value?.name ?? "",
+                email: user.value?.email ?? "",
             },
         };
     });
 
-    async function signOut(): Promise<void> {
-        await nuxtSignOut();
+    const isAuthEnabled = computed(() => !!user.value);
+
+    async function clearServerSession(): Promise<void> {
+        try {
+            await $fetch("/api/auth/logout", {
+                method: "POST",
+            });
+        } catch {
+            // Ignore errors during logout
+        }
+        user.value = undefined;
     }
 
     async function signIn(): Promise<void> {
-        await nuxtSignIn(undefined);
+        await navigateTo("/api/auth/authorize", { external: true });
+    }
+
+    async function signOut(): Promise<void> {
+        await clearServerSession();
+        await navigateTo("/api/auth/logout/azure-ad", { external: true });
     }
 
     return {
         signIn,
         signOut,
-        data,
-        isAuthEnabled: computed(() => !!nuxtData.value),
+        data: readonly(data) as Readonly<Ref<AuthData | null>>,
+        isAuthEnabled: readonly(isAuthEnabled) as Readonly<Ref<boolean>>,
     };
 }

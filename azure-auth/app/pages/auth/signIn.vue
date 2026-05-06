@@ -1,18 +1,15 @@
 <script setup lang="ts">
+import * as microsoftTeams from "@microsoft/teams-js";
+
 definePageMeta({
-    auth: { unauthenticatedOnly: true, navigateAuthenticatedTo: "/" },
+    public: true,
     layout: "auth",
 });
 
-const { signIn } = useAuth();
-
+const { signIn } = useAppAuth();
 const { t } = useI18n();
 
-// Add reactive state for loading animation
-const isLoading = ref(true);
 const loadingText = ref(t("auth.connecting"));
-
-// Simulate loading states for better UX
 const loadingStates = [
     t("auth.connecting"),
     t("auth.authenticating"),
@@ -20,37 +17,72 @@ const loadingStates = [
 ];
 
 let currentStateIndex = 0;
+const isLoading = ref(false);
 
-onMounted(() => {
-    // Cycle through loading states
+onMounted(async () => {
     const loadingInterval = setInterval(() => {
         currentStateIndex = (currentStateIndex + 1) % loadingStates.length;
         loadingText.value = loadingStates[currentStateIndex] as string;
     }, 1000);
 
     setTimeout(() => {
-        signIn("azure-ad");
-    }, 1500);
-
-    // Cleanup interval after 10 seconds
-    setTimeout(() => {
         clearInterval(loadingInterval);
     }, 1000);
+
+    if (await signInWithTeams()) {
+        return;
+    }
+
+    await signInWithAzureAd();
 });
+
+async function signInWithAzureAd() {
+    isLoading.value = true;
+
+    try {
+        await signIn();
+    } catch (e) {
+        isLoading.value = false;
+    }
+}
+
+async function signInWithTeams() {
+    isLoading.value = true;
+
+    try {
+        await microsoftTeams.app.initialize();
+        const token = await microsoftTeams.authentication.getAuthToken();
+
+        const session = useState<AuthSessionUser | null>(
+            "auth:session",
+            () => null,
+        );
+
+        const response = await $fetch<AuthSessionUser>("/api/auth/teams-sso", {
+            method: "POST",
+            body: { token },
+        });
+
+        session.value = response;
+        await navigateTo("/");
+        return true;
+    } catch (e) {
+        console.log("Teams SSO sign-in failed, falling back to Azure AD", e);
+        isLoading.value = false;
+        return false;
+    }
+}
 </script>
 
 <template>
     <div class="main-container">
-        <!-- Animated background elements -->
         <div class="background-overlay">
             <div class="bg-circle bg-circle-1"></div>
             <div class="bg-circle bg-circle-2"></div>
             <div class="bg-circle bg-circle-3"></div>
         </div>
 
-        <!-- Main content -->
         <div class="content-wrapper">
-            <!-- Logo/Brand area -->
             <div class="brand-section">
                 <div class="logo-container">
                     <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,20 +95,12 @@ onMounted(() => {
                 <p class="subtitle">{{ t("auth.signInToContinue") }}</p>
             </div>
 
-            <!-- Loading card -->
             <div class="loading-card">
                 <div class="card-content">
-                    <!-- Loading text with animation -->
-                    <h2 class="loading-title">
-                        {{ loadingText }}
-                    </h2>
+                    <h2 class="loading-title">{{ loadingText }}</h2>
 
-                    <!-- Description -->
-                    <p class="description">
-                        {{ t("auth.azureAdDescription") }}
-                    </p>
+                    <p class="description">{{ t("auth.azureAdDescription") }}</p>
 
-                    <!-- Progress dots -->
                     <div class="progress-dots">
                         <div class="dot dot-1"></div>
                         <div class="dot dot-2"></div>
@@ -89,7 +113,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Main container */
 .main-container {
     min-height: 100vh;
     background: linear-gradient(to bottom right, #dbeafe, #ffffff, #e0e7ff);
@@ -97,7 +120,6 @@ onMounted(() => {
     overflow: hidden;
 }
 
-/* Background overlay */
 .background-overlay {
     position: absolute;
     top: 0;
@@ -107,7 +129,6 @@ onMounted(() => {
     opacity: 0.2;
 }
 
-/* Background circles */
 .bg-circle {
     position: absolute;
     width: 24rem;
@@ -138,7 +159,6 @@ onMounted(() => {
     animation-delay: 4s;
 }
 
-/* Content wrapper */
 .content-wrapper {
     position: relative;
     z-index: 10;
@@ -150,13 +170,11 @@ onMounted(() => {
     padding: 2rem;
 }
 
-/* Brand section */
 .brand-section {
     margin-bottom: 3rem;
     text-align: center;
 }
 
-/* Logo container */
 .logo-container {
     display: inline-flex;
     align-items: center;
@@ -165,7 +183,8 @@ onMounted(() => {
     height: 5rem;
     background: linear-gradient(to right, #3b82f6, #9333ea);
     border-radius: 50%;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
     margin-bottom: 1.5rem;
     animation: bounce 2s infinite;
 }
@@ -176,7 +195,6 @@ onMounted(() => {
     color: white;
 }
 
-/* Main title */
 .main-title {
     font-size: 2.25rem;
     line-height: 2.5rem;
@@ -185,12 +203,10 @@ onMounted(() => {
     margin-bottom: 0.5rem;
 }
 
-/* Subtitle */
 .subtitle {
     color: #4b5563;
 }
 
-/* Loading card */
 .loading-card {
     background-color: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(12px);
@@ -207,7 +223,6 @@ onMounted(() => {
     text-align: center;
 }
 
-/* Loading title */
 .loading-title {
     font-size: 1.5rem;
     line-height: 2rem;
@@ -217,14 +232,12 @@ onMounted(() => {
     animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Description */
 .description {
     color: #4b5563;
     margin-bottom: 1.5rem;
     line-height: 1.625;
 }
 
-/* Progress dots */
 .progress-dots {
     display: flex;
     justify-content: center;
@@ -247,7 +260,6 @@ onMounted(() => {
     animation-delay: 0.4s;
 }
 
-/* Animations */
 @keyframes pulse {
 
     0%,
@@ -284,12 +296,10 @@ onMounted(() => {
     }
 }
 
-/* Smooth transitions */
 * {
     transition: all 0.3s ease;
 }
 
-/* Responsive design */
 @media (max-width: 640px) {
     .content-wrapper {
         padding: 1rem;

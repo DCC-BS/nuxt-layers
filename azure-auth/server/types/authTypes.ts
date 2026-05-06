@@ -1,23 +1,43 @@
-import type { Session } from "next-auth";
-import type { JWT } from "next-auth/jwt";
+import type { AccountInfo } from "@azure/msal-node";
+import { z } from "zod";
 
-/**
- * Extended session type that may include error information for token refresh failures
- */
-export interface ExtendedSession extends Session {
+export interface ExtendedSession extends AuthSession {
     error?: string;
-    idToken?: string;
-    user: Session["user"] & { roles: string[] };
-    apiAccessTokenExpiresAt?: number;
-    apiAccessToken?: string;
 }
 
-/**
- * Extended JWT type that includes optional idToken for backend authentication
- */
-export interface ExtendedJWT extends JWT {
-    idToken?: string;
-    refreshToken?: string;
-    expiresAt?: number;
-    provider?: string;
+export const tokenPayloadSchema = z.looseObject({
+    // Object ID of the user in Azure AD. Stable tenant-wide identifier for the user. Same use + same tenant = same OID
+    oid: z.string(),
+    // subject identifier. Stable per client app and user. Same user + same client app = same sub
+    sub: z.string(),
+    // login name
+    preferred_username: z.string().optional(),
+    // Email address of the user
+    email: z.string().optional(),
+    // Human-readable name of the user
+    name: z.string(),
+    // Roles assigned to the user in Azure AD
+    roles: z.array(z.string()).default([]),
+    // Expiration time of the token as a Unix timestamp (seconds since epoch)
+    exp: z.number(),
+});
+
+export type TokenPayload = z.infer<typeof tokenPayloadSchema>;
+
+export const authSessionPayloadSchema = z.object({
+    userId: z.string(),
+    email: z.string(),
+    name: z.string(),
+    roles: z.array(z.string()),
+    inMsTeams: z.boolean(),
+    account: z.any(),
+});
+
+export type AuthSessionPayload = z.infer<typeof authSessionPayloadSchema> & {
+    account: AccountInfo;
+};
+
+export interface AuthSession {
+    user: AuthSessionUser;
+    apiAccessToken?: string;
 }
