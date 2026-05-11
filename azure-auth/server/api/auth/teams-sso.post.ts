@@ -23,9 +23,14 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig().azureAuth;
     const msalClient = getMsalClient();
 
+    const scopes = [];
+    if (config.apiClientId) {
+        scopes.push(`api://${config.apiClientId}/user_impersonation`);
+    }
+
     const oboResponse = await msalClient.acquireTokenOnBehalfOf({
         oboAssertion: body.token,
-        scopes: [`api://${config.apiClientId}/user_impersonation`],
+        scopes,
     });
 
     if (!oboResponse?.accessToken) {

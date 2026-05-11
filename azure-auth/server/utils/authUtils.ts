@@ -14,15 +14,15 @@ export const MS_TEAMS_FLAG_COOKIE_NAME = "auth_ms_treams";
 const TOKEN_EXPIRY_BUFFER_SECONDS = 60;
 export const COOKIE_MAX_AGE = 60 * 60 * 24; // 1 day
 
-export function getScopes() {
+export function getScopes(): string[] {
     const authConfig = getAuthConfig();
-    return [
-        "openid",
-        "profile",
-        "email",
-        "offline_access",
-        `api://${authConfig.apiClientId}/user_impersonation`,
-    ];
+
+    const scopes = ["openid", "profile", "email", "offline_access"];
+
+    if (authConfig.apiClientId) {
+        scopes.push(`api://${authConfig.apiClientId}/user_impersonation`);
+    }
+    return scopes;
 }
 
 export async function getGraphQlAccessToken(

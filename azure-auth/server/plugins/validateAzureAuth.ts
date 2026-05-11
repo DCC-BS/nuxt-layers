@@ -20,12 +20,6 @@ export default defineNitroPlugin(() => {
         );
     }
 
-    if (!auth_config.apiClientId) {
-        console.error(
-            "AZURE AUTH: API Client ID is missing. Set the environment variable NUXT_AZURE_AUTH_API_CLIENT_ID",
-        );
-    }
-
     if (!auth_config.secret) {
         console.error(
             "AZURE AUTH: Auth Secret is missing. Set the environment variable NUXT_AZURE_AUTH_SECRET",
