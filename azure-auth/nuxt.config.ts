@@ -26,6 +26,7 @@ export default defineNuxtConfig({
             apiClientId: "",
             secret: "",
             origin: "",
+            scopes: "",
         },
     },
 });
