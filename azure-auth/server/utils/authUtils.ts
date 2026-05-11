@@ -29,9 +29,9 @@ export async function getGraphQlAccessToken(
     event: H3Event,
 ): Promise<string | null> {
     const cookie = getCookie(event, SESSION_COOKIE_NAME);
+    const logger = getEventLogger(event);
 
     if (!cookie) {
-        console.log("No session cookie found");
         return null;
     }
 
@@ -44,7 +44,7 @@ export async function getGraphQlAccessToken(
 
         return result.accessToken;
     } catch (error) {
-        console.error("Error verifying session cookie: ", error);
+        logger.error(error, "Error verifying session cookie: ");
         return null;
     }
 }

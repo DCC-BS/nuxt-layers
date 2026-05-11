@@ -37,12 +37,12 @@ export function useAppAuth(): UseAppAuthReturns {
     }
 
     async function signIn(): Promise<void> {
-        await navigateTo("/api/auth/authorize", { external: true });
+        navigateTo("/api/auth/authorize", { external: true });
     }
 
     async function signOut(): Promise<void> {
         await clearServerSession();
-        await navigateTo("/api/auth/logout/azure-ad", { external: true });
+        navigateTo("/api/auth/logout/azure-ad", { external: true });
     }
 
     return {
