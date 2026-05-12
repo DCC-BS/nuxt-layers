@@ -37,12 +37,32 @@ export function useAppAuth(): UseAppAuthReturns {
     }
 
     async function signIn(): Promise<void> {
-        navigateTo("/api/auth/authorize", { external: true });
+        console.log(
+            "[useAuth] signIn: about to navigateTo /api/auth/authorize",
+        );
+        try {
+            await navigateTo("/api/auth/authorize", { external: true });
+            console.log(
+                "[useAuth] signIn: navigateTo returned (should not reach here for external)",
+            );
+        } catch (e) {
+            console.error("[useAuth] signIn: navigateTo threw:", e);
+            throw e;
+        }
     }
 
     async function signOut(): Promise<void> {
         await clearServerSession();
-        navigateTo("/api/auth/logout/azure-ad", { external: true });
+        console.log(
+            "[useAuth] signOut: about to navigateTo /api/auth/logout/azure-ad",
+        );
+        try {
+            await navigateTo("/api/auth/logout/azure-ad", { external: true });
+            console.log("[useAuth] signOut: navigateTo returned");
+        } catch (e) {
+            console.error("[useAuth] signOut: navigateTo threw:", e);
+            throw e;
+        }
     }
 
     return {

@@ -42,6 +42,7 @@ async function signInWithAzureAd() {
     try {
         await signIn();
     } catch (e) {
+        console.error("[signIn] signInWithAzureAd caught error:", e);
         isLoading.value = false;
     }
 }
