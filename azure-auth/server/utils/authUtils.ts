@@ -55,7 +55,6 @@ export async function getServerSession(
     const cookie = getCookie(event, SESSION_COOKIE_NAME);
 
     if (!cookie) {
-        console.log("No session cookie found");
         return null;
     }
 

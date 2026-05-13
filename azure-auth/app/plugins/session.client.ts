@@ -14,8 +14,7 @@ export default defineNuxtPlugin(async () => {
         });
 
         session.value = response;
-    } catch (e) {
-        console.log("No active session found", e);
+    } catch {
         session.value = undefined;
     }
 });

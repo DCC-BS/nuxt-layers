@@ -67,8 +67,7 @@ async function signInWithTeams() {
         session.value = response;
         await navigateTo("/");
         return true;
-    } catch (e) {
-        console.log("Teams SSO sign-in failed, falling back to Azure AD", e);
+    } catch {
         isLoading.value = false;
         return false;
     }
