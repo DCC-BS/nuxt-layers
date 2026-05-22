@@ -52,8 +52,6 @@ export default defineEventHandler(async (event) => {
 
   const agent = new EnvHttpProxyAgent();
 
-  console.log(`title: ${title}, body: ${messageWithDetails}`);
-
   await $fetch(`https://api.github.com/repos/${owner}/${repo}/issues`, {
     method: "POST",
     headers: {
