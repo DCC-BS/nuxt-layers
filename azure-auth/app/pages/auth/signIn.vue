@@ -67,7 +67,8 @@ async function signInWithTeams() {
         session.value = response;
         await navigateTo("/");
         return true;
-    } catch {
+    } catch (e: unknown) {
+        console.log(e, "Teams auth failed");
         isLoading.value = false;
         return false;
     }
@@ -85,10 +86,18 @@ async function signInWithTeams() {
         <div class="content-wrapper">
             <div class="brand-section">
                 <div class="logo-container">
-                    <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
-                        </path>
+                    <svg
+                        class="logo-icon"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                        ></path>
                     </svg>
                 </div>
                 <h1 class="main-title">{{ t("auth.welcomeBack") }}</h1>
@@ -99,7 +108,9 @@ async function signInWithTeams() {
                 <div class="card-content">
                     <h2 class="loading-title">{{ loadingText }}</h2>
 
-                    <p class="description">{{ t("auth.azureAdDescription") }}</p>
+                    <p class="description">
+                        {{ t("auth.azureAdDescription") }}
+                    </p>
 
                     <div class="progress-dots">
                         <div class="dot dot-1"></div>
@@ -183,7 +194,8 @@ async function signInWithTeams() {
     height: 5rem;
     background: linear-gradient(to right, #3b82f6, #9333ea);
     border-radius: 50%;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
         0 4px 6px -2px rgba(0, 0, 0, 0.05);
     margin-bottom: 1.5rem;
     animation: bounce 2s infinite;
@@ -261,7 +273,6 @@ async function signInWithTeams() {
 }
 
 @keyframes pulse {
-
     0%,
     100% {
         opacity: 1;
@@ -273,7 +284,6 @@ async function signInWithTeams() {
 }
 
 @keyframes bounce {
-
     0%,
     20%,
     53%,
