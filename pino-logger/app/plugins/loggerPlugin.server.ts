@@ -1,9 +1,17 @@
-import { pino, type TransportTargetOptions } from "pino";
+import { pino, type Logger, type TransportTargetOptions } from "pino";
 import { createBreadcrumbAwareLogger } from "#layers/pino-logger/shared/utils/pinoBreadcrumbWrapper";
 import { useBreadcrumbs } from "../composables/useBreadcrumbs";
 
-export default defineNuxtPlugin(async (nuxtApp) => {
-    const loggerConfig = useRuntimeConfig().public.logger;
+// Singleton: pino with `transport` spawns a worker thread on creation.
+// Nuxt server plugins run per SSR request, so creating the logger inside the
+// plugin leaked a logger + worker thread on every render. Create it once per
+// process instead.
+let baseLogger: Logger | undefined;
+
+function getBaseLogger(loglevel: string): Logger {
+    if (baseLogger) {
+        return baseLogger;
+    }
 
     const productionTargets = [
         {
@@ -22,11 +30,11 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         },
     ] as TransportTargetOptions[];
 
-    const baseLogger = pino({
+    baseLogger = pino({
         base: { origin: "ssr" },
         timestamp: true,
         enabled: true,
-        level: loggerConfig.loglevel as string,
+        level: loglevel,
         transport: {
             targets:
                 process.env.NODE_ENV === "production"
@@ -35,8 +43,16 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         },
     });
 
-    const breadcrumbManager = useBreadcrumbs();
-    const logger = createBreadcrumbAwareLogger(baseLogger, breadcrumbManager);
+    return baseLogger;
+}
+
+export default defineNuxtPlugin(async (nuxtApp) => {
+    const loggerConfig = useRuntimeConfig().public.logger;
+
+    const logger = createBreadcrumbAwareLogger(
+        getBaseLogger(loggerConfig.loglevel as string),
+        useBreadcrumbs(),
+    );
 
     nuxtApp.provide("logger", logger);
 });
