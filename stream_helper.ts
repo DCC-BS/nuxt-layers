@@ -25,8 +25,8 @@ export function toStream<T>(items: T[], prefix: string, postfix: string) {
 	return stream;
 }
 
-export function toJsonStream<T>(items: T[]) {
-	return toStream(items, "", "");
+export function toJsonlStream<T>(items: T[]) {
+	return toStream(items, "", "\n");
 }
 
 export function toSSEStream<T>(items: T[]) {
