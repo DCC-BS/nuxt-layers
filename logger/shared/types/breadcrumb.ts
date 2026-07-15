@@ -90,12 +90,3 @@ export interface BreadcrumbConfig {
         hint?: unknown,
     ) => Breadcrumb | null;
 }
-
-export const DEFAULT_BREADCRUMB_CONFIG: BreadcrumbConfig = {
-    maxBreadcrumbs: 20,
-    enabled: true,
-    autoCollect: {
-        navigation: true,
-        xhr: true,
-    },
-} as const;

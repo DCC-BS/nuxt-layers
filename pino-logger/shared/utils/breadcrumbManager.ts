@@ -3,7 +3,15 @@ import type {
     BreadcrumbConfig,
     BreadcrumbLevel,
 } from "#layers/logger/shared/types/breadcrumb";
-import { DEFAULT_BREADCRUMB_CONFIG } from "#layers/logger/shared/types/breadcrumb";
+
+export const DEFAULT_BREADCRUMB_CONFIG = {
+    autoCollect: {
+        navigation: true,
+        xhr: true
+    },
+    enabled: true,
+    maxBreadcrumbs: 20,
+} satisfies BreadcrumbConfig;
 
 export class BreadcrumbManager {
     private breadcrumbs: Breadcrumb[] = [];

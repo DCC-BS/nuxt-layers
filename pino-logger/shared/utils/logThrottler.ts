@@ -1,5 +1,11 @@
 import type { ErrorThrottleConfig } from "#layers/logger/shared/types/errorThrottle";
-import { DEFAULT_ERROR_THROTTLE_CONFIG } from "#layers/logger/shared/types/errorThrottle";
+
+export const DEFAULT_ERROR_THROTTLE_CONFIG = {
+    enabled: true,
+    maxKeys: 1000,
+    maxPerWindow: 1,
+    windowMs: 60 * 60 * 1000,
+} satisfies ErrorThrottleConfig;
 
 interface ThrottleEntry {
     windowStart: number;

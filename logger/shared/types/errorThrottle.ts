@@ -8,7 +8,7 @@ export interface ErrorThrottleConfig {
     /**
      * Length of the rolling window (in milliseconds) within which duplicate
      * errors are counted against the suppression threshold.
-     * @default 60000
+     * @default 60 * 60 * 1000
      */
     windowMs: number;
 
@@ -26,10 +26,3 @@ export interface ErrorThrottleConfig {
      */
     maxKeys: number;
 }
-
-export const DEFAULT_ERROR_THROTTLE_CONFIG: ErrorThrottleConfig = {
-    enabled: true,
-    windowMs: 60 * 60 * 1000, // 1 hour
-    maxPerWindow: 1,
-    maxKeys: 1000,
-} as const;
