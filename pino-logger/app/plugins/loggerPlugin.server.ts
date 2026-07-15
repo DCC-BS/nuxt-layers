@@ -1,4 +1,4 @@
-import { pino, type Logger, type TransportTargetOptions } from "pino";
+import { type Logger, pino, type TransportTargetOptions } from "pino";
 import { createBreadcrumbAwareLogger } from "#layers/pino-logger/shared/utils/pinoBreadcrumbWrapper";
 import { useBreadcrumbs } from "../composables/useBreadcrumbs";
 

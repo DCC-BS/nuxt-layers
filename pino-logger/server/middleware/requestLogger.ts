@@ -1,6 +1,7 @@
 import type { H3Event } from "h3";
 import { defineEventHandler, getRequestHeader } from "h3";
 import { getEventBreadcrumbManager } from "../utils/breadcrumbStorage";
+import { getLogThrottler } from "../utils/logThrottleStorage";
 
 export default defineEventHandler(async (event: H3Event): Promise<void> => {
     const method = event.node.req.method;
@@ -11,6 +12,7 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
 
     const logger = getEventLogger(event);
     const breadcrumbManager = getEventBreadcrumbManager(event);
+    const logThrottler = getLogThrottler();
 
     const requestInfo = {
         method,
@@ -46,28 +48,52 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
     event.node.res.on("finish", () => {
         const statusCode = event.node.res.statusCode;
 
-        if (statusCode >= 400) {
-            if (loggerConfig.breadcrumbs?.enabled && loggerConfig.breadcrumbs.autoCollect.xhr) {
-                breadcrumbManager.addBreadcrumb({
-                    category: "http",
-                    type: "http",
-                    message: `Failed request (${statusCode})`,
-                    level: "error",
-                    data: {
-                        method,
-                        url,
-                        statusCode,
-                    },
-                });
-            }
+        if (statusCode < 400) {
+            return;
+        }
 
-            logger.error(
+        const throttleResult = logThrottler.check(
+            `${method} ${url} ${statusCode}`,
+        );
+
+        if (throttleResult.summary) {
+            logger.warn(
                 {
-                    ...requestInfo,
-                    statusCode,
+                    key: throttleResult.summary.key,
+                    suppressedCount: throttleResult.summary.suppressedCount,
+                    windowMs: throttleResult.summary.windowMs,
                 },
-                `Failed request (${statusCode})`,
+                `Suppressed ${throttleResult.summary.suppressedCount} repeated error(s) for ${throttleResult.summary.key} in last ${throttleResult.summary.windowMs}ms`,
             );
         }
+
+        if (!throttleResult.allow) {
+            return;
+        }
+
+        if (
+            loggerConfig.breadcrumbs?.enabled &&
+            loggerConfig.breadcrumbs.autoCollect.xhr
+        ) {
+            breadcrumbManager.addBreadcrumb({
+                category: "http",
+                type: "http",
+                message: `Failed request (${statusCode})`,
+                level: "error",
+                data: {
+                    method,
+                    url,
+                    statusCode,
+                },
+            });
+        }
+
+        logger.error(
+            {
+                ...requestInfo,
+                statusCode,
+            },
+            `Failed request (${statusCode})`,
+        );
     });
 });

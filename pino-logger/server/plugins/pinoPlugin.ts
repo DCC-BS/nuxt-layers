@@ -30,10 +30,6 @@ export default defineNitroPlugin((nitroApp) => {
         },
     });
 
-    nitroApp.hooks.hook("error", (error) => {
-        baseLogger.error(error, "An error occurred:");
-    });
-
     nitroApp.hooks.hook("request", (event) => {
         const breadcrumbManager = getEventBreadcrumbManager(event);
         const logger = createBreadcrumbAwareLogger(
