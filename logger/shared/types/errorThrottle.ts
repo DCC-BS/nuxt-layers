@@ -29,7 +29,7 @@ export interface ErrorThrottleConfig {
 
 export const DEFAULT_ERROR_THROTTLE_CONFIG: ErrorThrottleConfig = {
     enabled: true,
-    windowMs: 60_000,
+    windowMs: 60 * 60 * 1000, // 1 hour
     maxPerWindow: 1,
     maxKeys: 1000,
 } as const;

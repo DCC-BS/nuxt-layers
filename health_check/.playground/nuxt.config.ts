@@ -1,3 +1,10 @@
 export default defineNuxtConfig({
-    extends: [".."],
+    extends: ["..", "../../logger","../../pino-logger"],
+    runtimeConfig: {
+        public: {
+            logger: {
+                loglevel: "debug",
+            }
+        }
+    }
 });

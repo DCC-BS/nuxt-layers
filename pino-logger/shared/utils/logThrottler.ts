@@ -71,6 +71,7 @@ export class LogThrottler {
         }
 
         entry.suppressedCount++;
+
         return { allow: false, summary };
     }
 
