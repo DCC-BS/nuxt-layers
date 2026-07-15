@@ -40,7 +40,7 @@ export class LogThrottler {
      * Decide whether an error with the given signature should be logged now.
      * Windows roll over lazily (no timers), so this is safe in serverless.
      */
-    check(key: string, now: number = Date.now()): ThrottleResult {
+    check(key: string, now = Date.now()): ThrottleResult {
         if (!this.config.enabled) {
             return { allow: true };
         }
