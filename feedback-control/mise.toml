@@ -1,0 +1,6 @@
+[tools]
+bun = "1.3.0"
+"npm:varlock" = "1.13.0"
+
+[tasks.dev]
+run = "varlock run -- bun dev"
