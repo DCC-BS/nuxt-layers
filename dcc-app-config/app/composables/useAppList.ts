@@ -2,17 +2,17 @@ const apps = [
     {
         name: "TextMate",
         slug: "textmate",
-        image: "app-icons/textmate-96x96.png",
+        image: "app-icons/app-icon-textmate.svg",
     },
     {
         name: "Transcribo",
         slug: "transcribo",
-        image: "app-icons/transcriboLogo.svg"
+        image: "app-icons/app-icon-transcribo.svg"
     },
     {
         name: "BS-Übersetzer",
         slug: "bs-uebersetzer",
-        image: "app-icons/bs-uebersetzer.png",
+        image: "app-icons/app-icon-translate.svg",
     },
 ] as const;
 
