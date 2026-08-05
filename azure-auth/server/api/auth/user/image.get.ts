@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
+
     const imageUrl = await fetch(
         "https://graph.microsoft.com/v1.0/me/photo/$value",
         {
