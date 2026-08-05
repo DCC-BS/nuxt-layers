@@ -1,4 +1,4 @@
-import { createError, getCookie, type H3Event } from "h3";
+import { createError, deleteCookie, getCookie, type H3Event } from "h3";
 import { jwtVerify } from "jose";
 import { z } from "zod";
 import { useRuntimeConfig } from "#imports";
@@ -13,6 +13,25 @@ export const SESSION_COOKIE_NAME = "auth_session";
 export const MS_TEAMS_FLAG_COOKIE_NAME = "auth_ms_treams";
 const TOKEN_EXPIRY_BUFFER_SECONDS = 60;
 export const COOKIE_MAX_AGE = 60 * 60 * 24; // 1 day
+
+const INTERACTION_REQUIRED_ERROR_CODES = new Set([
+    "no_tokens_found",
+    "invalid_grant",
+    "interaction_required",
+]);
+
+function isInteractionRequiredError(error: unknown): boolean {
+    if (typeof error !== "object" || error === null) return false;
+    const errorCode = (error as { errorCode?: unknown }).errorCode;
+    return (
+        typeof errorCode === "string" &&
+        INTERACTION_REQUIRED_ERROR_CODES.has(errorCode)
+    );
+}
+
+function clearSessionCookie(event: H3Event): void {
+    deleteCookie(event, SESSION_COOKIE_NAME, { path: "/" });
+}
 
 export function getScopes(): string[] {
     const authConfig = getAuthConfig();
@@ -35,16 +54,31 @@ export async function getGraphQlAccessToken(
         return null;
     }
 
+    const config = useRuntimeConfig();
+    const secret = new TextEncoder().encode(config.azureAuth.secret);
+
     try {
-        const config = useRuntimeConfig();
-        const secret = new TextEncoder().encode(config.azureAuth.secret);
-
         const { payload } = await jwtVerify<AuthSessionPayload>(cookie, secret);
-        const result = await getOrRefreshAccessToken(payload, ["User.Read"]);
 
-        return result.accessToken;
+        try {
+            const result = await getOrRefreshAccessToken(payload, [
+                "User.Read",
+            ]);
+            return result.accessToken;
+        } catch (refreshError) {
+            if (isInteractionRequiredError(refreshError)) {
+                logger.warn(
+                    { userId: payload.userId, email: payload.email },
+                    "Session no longer refreshable; clearing session cookie",
+                );
+                clearSessionCookie(event);
+            } else {
+                logger.error(refreshError, "Error refreshing access token");
+            }
+            return null;
+        }
     } catch (error) {
-        logger.error(error, "Error verifying session cookie: ");
+        logger.error(error, "Error verifying session cookie");
         return null;
     }
 }
@@ -58,24 +92,39 @@ export async function getServerSession(
         return null;
     }
 
+    const logger = getEventLogger(event);
+    const config = useRuntimeConfig();
+    const secret = new TextEncoder().encode(config.azureAuth.secret);
+
     try {
-        const config = useRuntimeConfig();
-        const secret = new TextEncoder().encode(config.azureAuth.secret);
-
         const { payload } = await jwtVerify<AuthSessionPayload>(cookie, secret);
-        const result = await getOrRefreshAccessToken(payload, getScopes());
 
-        return {
-            user: {
-                id: payload.userId,
-                email: payload.email,
-                name: payload.name,
-                roles: payload.roles,
-            },
-            apiAccessToken: result.accessToken,
-        };
+        try {
+            const result = await getOrRefreshAccessToken(payload, getScopes());
+
+            return {
+                user: {
+                    id: payload.userId,
+                    email: payload.email,
+                    name: payload.name,
+                    roles: payload.roles,
+                },
+                apiAccessToken: result.accessToken,
+            };
+        } catch (refreshError) {
+            if (isInteractionRequiredError(refreshError)) {
+                logger.warn(
+                    { userId: payload.userId, email: payload.email },
+                    "Session no longer refreshable; clearing session cookie",
+                );
+                clearSessionCookie(event);
+            } else {
+                logger.error(refreshError, "Error refreshing access token");
+            }
+            return null;
+        }
     } catch (error) {
-        console.error("Error verifying session cookie: ", error);
+        logger.error(error, "Error verifying session cookie");
         return null;
     }
 }
