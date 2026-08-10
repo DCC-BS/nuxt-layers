@@ -1,7 +1,7 @@
 import { createError, defineEventHandler, readBody, setCookie } from "h3";
 import { SignJWT } from "jose";
 import { useRuntimeConfig } from "#imports";
-import type { AuthSessionUser } from "#layers/azure-auth/shared/types/session";
+import type { AuthSessionUser } from "#layers/auth/shared/types/session";
 import { authSessionPayloadSchema } from "../../types/authTypes";
 import {
     COOKIE_MAX_AGE,
@@ -96,5 +96,6 @@ export default defineEventHandler(async (event) => {
         email: sessionPayload.email,
         name: sessionPayload.name,
         roles: sessionPayload.roles,
+        inMsTeams: sessionPayload.inMsTeams,
     } as AuthSessionUser;
 });

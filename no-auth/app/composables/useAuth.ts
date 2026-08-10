@@ -2,12 +2,21 @@ import type { AuthData } from "#layers/auth/app/types/authData";
 import type { UseAppAuthReturns } from "#layers/auth/app/types/composableTypes";
 
 export function useAppAuth(): UseAppAuthReturns {
+    const session = useState<AuthSessionUser>("auth:session", () => ({
+        id: "",
+        name: "",
+        email: "",
+        image: "",
+        roles: [],
+        inMsTeams: false,
+    }));
+
     const data = computed<AuthData>(() => {
         return {
             user: {
-                image: "",
-                name: "",
-                email: "",
+                image: session.value.image ?? "",
+                name: session.value.name,
+                email: session.value.email,
             },
         };
     });
@@ -25,5 +34,6 @@ export function useAppAuth(): UseAppAuthReturns {
         signOut,
         data,
         isAuthEnabled: computed(() => false),
+        inMsTeams: computed(() => session.value.inMsTeams),
     };
 }

@@ -4,4 +4,5 @@ export interface AuthSessionUser {
     email: string;
     image?: string;
     roles: string[];
+    inMsTeams: boolean;
 }

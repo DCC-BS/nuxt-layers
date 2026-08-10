@@ -1,5 +1,5 @@
 import { defineEventHandler } from "h3";
-import type { AuthSessionUser } from "#layers/azure-auth/shared/types/session";
+import type { AuthSessionUser } from "#layers/auth/shared/types/session";
 import { getGraphQlAccessToken } from "../../utils/authUtils";
 
 export default defineEventHandler(async (event) => {

@@ -8,9 +8,6 @@ definePageMeta({
 
 const { signIn } = useAppAuth();
 const { t } = useI18n();
-const inMsTeams = useCookie("inMsTeams", {
-    default: () => false
-});
 
 const loadingText = ref(t("auth.connecting"));
 const loadingStates = [
@@ -33,11 +30,9 @@ onMounted(async () => {
     }, 1000);
 
     if (await signInWithTeams()) {
-        inMsTeams.value = true;
         return;
     }
 
-    inMsTeams.value = false;
     await signInWithAzureAd();
 });
 

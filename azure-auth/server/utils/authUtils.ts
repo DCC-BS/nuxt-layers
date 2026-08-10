@@ -2,15 +2,15 @@ import { createError, deleteCookie, getCookie, type H3Event } from "h3";
 import { jwtVerify } from "jose";
 import { z } from "zod";
 import { useRuntimeConfig } from "#imports";
+import type { AuthSession } from "#layers/auth/server/types/authSession";
 import {
-    type AuthSession,
     type AuthSessionPayload,
     type TokenPayload,
     tokenPayloadSchema,
 } from "../types/authTypes";
 
 export const SESSION_COOKIE_NAME = "auth_session";
-export const MS_TEAMS_FLAG_COOKIE_NAME = "auth_ms_treams";
+export const MS_TEAMS_FLAG_COOKIE_NAME = "auth_ms_teams";
 const TOKEN_EXPIRY_BUFFER_SECONDS = 60;
 export const COOKIE_MAX_AGE = 60 * 60 * 24; // 1 day
 
@@ -108,6 +108,7 @@ export async function getServerSession(
                     email: payload.email,
                     name: payload.name,
                     roles: payload.roles,
+                    inMsTeams: payload.inMsTeams,
                 },
                 apiAccessToken: result.accessToken,
             };

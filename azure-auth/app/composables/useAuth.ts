@@ -24,6 +24,7 @@ export function useAppAuth(): UseAppAuthReturns {
     });
 
     const isAuthEnabled = computed(() => !!user.value);
+    const inMsTeams = computed(() => !!user.value?.inMsTeams);
 
     async function clearServerSession(): Promise<void> {
         try {
@@ -50,5 +51,6 @@ export function useAppAuth(): UseAppAuthReturns {
         signOut,
         data: readonly(data) as Readonly<Ref<AuthData | null>>,
         isAuthEnabled: readonly(isAuthEnabled) as Readonly<Ref<boolean>>,
+        inMsTeams: readonly(inMsTeams) as Readonly<Ref<boolean>>,
     };
 }

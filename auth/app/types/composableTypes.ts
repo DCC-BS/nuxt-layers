@@ -9,6 +9,7 @@ export type UseAppAuthReturns = {
     signOut: SignOut;
     data: Readonly<Ref<AuthData | null>>;
     isAuthEnabled: Readonly<Ref<boolean>>;
+    inMsTeams: Readonly<Ref<boolean>>;
 };
 
 export type UseAppAuth = () => UseAppAuthReturns;
