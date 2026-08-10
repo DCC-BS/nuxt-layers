@@ -1,0 +1,19 @@
+[tools]
+bun = "1.3.0"
+node = "24.9.0"
+usage = "3.5.6"
+
+# This is a monorepo of independent Nuxt layers. The root mise.toml pins the
+# shared toolchain (bun + node) so every layer inherits the same versions when
+# you cd into it. Each layer keeps its own package.json and biome.json; per-layer
+# dev/build/lint is run from within the layer directory (e.g. `cd auth && bun dev`).
+
+# ── Setup ─────────────────────────────────────────────────────────────────────
+
+[tasks.install]
+description = "install dependencies for every layer"
+run = "for d in */; do if [ -f \"${d}package.json\" ]; then echo \"→ ${d}\" && (cd \"${d}\" && bun install --silent); fi; done"
+
+[tasks."layers:check"]
+description = "run biome check in every layer that has a biome.json"
+run = "for d in */; do if [ -f \"${d}biome.json\" ]; then echo \"→ ${d}\" && (cd \"${d}\" && bunx biome check --fix); fi; done"
