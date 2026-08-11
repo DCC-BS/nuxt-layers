@@ -26,6 +26,9 @@ export type AppLink = {
 
 export function useAppList(currentAppName: AppName): AppLink[] {
     const {
+        app: {
+            baseURL
+        },
         public: {
             appConfig: { appListUrlTemplate },
         },
@@ -35,6 +38,7 @@ export function useAppList(currentAppName: AppName): AppLink[] {
         .filter((app) => app.name !== currentAppName)
         .map((app) => ({
             ...app,
+            image: `${baseURL}${app.image}`,
             to: appListUrlTemplate.replaceAll("{APP_NAME}", app.slug),
         }));
 }
