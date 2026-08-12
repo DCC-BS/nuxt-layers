@@ -4,4 +4,4 @@ This layer provides Azure AD authentication integration for Nuxt applications, e
 
 ## Documentation
 
-For detailed information about this layer, please visit the [official documentation](https://dcc-bs.github.io/documentation/nuxt-layers/azure-auth).
+For detailed information about this layer, please visit the [official documentation](https://dcc-bs.github.io/documentation/nuxt-layers/auth.html).
