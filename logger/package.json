@@ -12,7 +12,7 @@
         "check": "bunx biome check --write"
     },
     "devDependencies": {
-        "@types/node": "25.9.4",
+        "@types/node": "26.4.1",
         "c12": "^3.3.3",
         "nuxt": "4.4.8",
         "typescript": "^5.9.3",
