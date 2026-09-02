@@ -4,7 +4,7 @@
     "main": "./nuxt.config.ts",
     "devDependencies": {
         "@biomejs/biome": "2.3.14",
-        "@iconify-json/lucide": "1.2.114",
+        "@iconify-json/lucide": "1.2.129",
         "@nuxt/ui": "4.9.0",
         "@types/node": "25.9.4",
         "nuxt": "4.4.8",
