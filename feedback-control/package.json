@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "main": "./nuxt.config.ts",
     "devDependencies": {
-        "@biomejs/biome": "2.3.14",
+        "@biomejs/biome": "2.5.12",
         "@iconify-json/lucide": "1.2.114",
         "@nuxt/ui": "4.9.0",
         "@types/node": "25.9.4",
