@@ -14,6 +14,16 @@ const apps = [
         slug: "bs-uebersetzer",
         image: "app-icons/app-icon-translate.svg",
     },
+    {
+        name: "Bebbi Bot",
+        slug: "chat",
+        image: "app-icons/app-icon-bebbibot.svg",
+    },
+    // {
+    //     name: "AnonyMate",
+    //     slug: "anonymate",
+    //     image: "app-icons/app-icon-anonymate.svg",
+    // },
 ] as const;
 
 export type AppName = (typeof apps)[number]["name"];
