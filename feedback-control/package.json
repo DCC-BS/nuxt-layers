@@ -4,9 +4,9 @@
     "main": "./nuxt.config.ts",
     "devDependencies": {
         "@biomejs/biome": "2.5.14",
-        "@iconify-json/lucide": "1.2.134",
-        "@nuxt/ui": "4.11.1",
-        "@types/node": "25.9.7",
+        "@iconify-json/lucide": "1.2.137",
+        "@nuxt/ui": "4.11.2",
+        "@types/node": "25.9.8",
         "nuxt": "4.5.2",
         "typescript": "^5.9.3",
         "vue": "3.5.43"
@@ -24,7 +24,7 @@
         "undici": "^8.5.0"
     },
     "peerDependencies": {
-        "@nuxt/ui": "4.11.1",
+        "@nuxt/ui": "4.11.2",
         "@nuxtjs/i18n": "^10.5.0",
         "motion-v": "2.4.4",
         "zod": "4.6.5"
