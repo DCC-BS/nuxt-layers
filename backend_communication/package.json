@@ -9,7 +9,7 @@
         "build": "nuxt build .playground",
         "generate": "nuxt generate .playground",
         "preview": "nuxt preview .playground",
-        "check": "bunx biome check --write"
+        "check": "biome check --write"
     },
     "peerDependencies": {
         "@dcc-bs/communication.bs.js": "^0.1.1"
