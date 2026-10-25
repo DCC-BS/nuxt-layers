@@ -7,8 +7,8 @@ export default defineNuxtConfig({
         public: {
             appConfig: {
                 appListUrlTemplate: "",
-            }
-        }
+            },
+        },
     },
     devtools: { enabled: true },
 });

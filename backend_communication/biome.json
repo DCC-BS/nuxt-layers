@@ -18,14 +18,14 @@
         "enabled": true,
         "actions": {
             "source": {
-                "recommended": true
+                "preset": "recommended"
             }
         }
     },
     "linter": {
         "enabled": true,
         "rules": {
-            "recommended": true,
+            "preset": "recommended",
             "style": {
                 "noParameterAssign": "error",
                 "useAsConstAssertion": "error",

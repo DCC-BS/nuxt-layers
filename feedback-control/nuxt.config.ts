@@ -5,7 +5,7 @@ const currentDir = dirname(fileURLToPath(import.meta.url));
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    compatibilityDate: '2026-07-27',
+    compatibilityDate: "2026-07-27",
     $meta: {
         name: "feedback-control",
     },

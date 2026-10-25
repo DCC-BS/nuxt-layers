@@ -5,6 +5,9 @@ node_modules
 out
 dist
 *.tgz
+.nuxt
+.output
+.data
 
 # code coverage
 coverage

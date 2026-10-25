@@ -2,18 +2,46 @@
 bun = "1.4.2"
 node = "24.21.0"
 usage = "3.6.0"
+"npm:@biomejs/biome" = "2.5.14"
 
 # This is a monorepo of independent Nuxt layers. The root mise.toml pins the
 # shared toolchain (bun + node) so every layer inherits the same versions when
 # you cd into it. Each layer keeps its own package.json and biome.json; per-layer
 # dev/build/lint is run from within the layer directory (e.g. `cd auth && bun dev`).
+#
+# The root package.json is only the test harness (tests/): unit tests for layer
+# utilities and an e2e suite that builds tests/fixture, an app that extends the
+# layers from this checkout the way our apps do.
 
 # ── Setup ─────────────────────────────────────────────────────────────────────
 
 [tasks.install]
-description = "install dependencies for every layer"
-run = "for d in */; do if [ -f \"${d}package.json\" ]; then echo \"→ ${d}\" && (cd \"${d}\" && bun install --silent); fi; done"
+description = "install dependencies for the test harness and every layer (frozen lockfiles on CI)"
+run = [
+    "bun install --silent ${CI:+--frozen-lockfile}",
+    "for d in */; do if [ -f \"${d}package.json\" ]; then echo \"→ ${d}\" && (cd \"${d}\" && bun install --silent ${CI:+--frozen-lockfile}); fi; done",
+]
 
 [tasks."layers:check"]
 description = "run biome check in every layer that has a biome.json"
-run = "for d in */; do if [ -f \"${d}biome.json\" ]; then echo \"→ ${d}\" && (cd \"${d}\" && bunx biome check --fix); fi; done"
+run = "for d in */; do if [ -f \"${d}biome.json\" ]; then echo \"→ ${d}\" && (cd \"${d}\" && biome check --fix); fi; done"
+
+[tasks."layers:lint"]
+description = "biome ci (no fixes) in every layer that has a biome.json"
+run = "set -e; for d in */; do if [ -f \"${d}biome.json\" ]; then echo \"→ ${d}\" && (cd \"${d}\" && biome ci .); fi; done"
+
+[tasks."layers:prepare"]
+description = "nuxt prepare every layer on its own (generates the .nuxt types the layer tsconfigs extend)"
+env = { NUXT_LAYERS_LOCAL = "true" }
+run = "set -e; for d in */; do if [ -f \"${d}nuxt.config.ts\" ]; then echo \"→ ${d}\" && (cd \"${d}\" && bunx nuxt prepare .playground); fi; done"
+
+# ── Tests ─────────────────────────────────────────────────────────────────────
+
+[tasks.test]
+description = "unit tests and the e2e suite (builds tests/fixture from the local layers)"
+depends = ["layers:prepare"]
+run = "bunx vitest run"
+
+[tasks.ci]
+description = "what CI runs: lint, prepare, tests"
+depends = ["layers:lint", "test"]

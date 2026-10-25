@@ -7,7 +7,7 @@ import type {
 export const DEFAULT_BREADCRUMB_CONFIG = {
     autoCollect: {
         navigation: true,
-        xhr: true
+        xhr: true,
     },
     enabled: true,
     maxBreadcrumbs: 20,

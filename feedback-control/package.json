@@ -2,15 +2,6 @@
     "name": "feedback-control",
     "version": "0.0.1",
     "main": "./nuxt.config.ts",
-    "devDependencies": {
-        "@biomejs/biome": "2.5.14",
-        "@iconify-json/lucide": "1.2.134",
-        "@nuxt/ui": "4.11.1",
-        "@types/node": "25.9.7",
-        "nuxt": "4.5.2",
-        "typescript": "^5.9.3",
-        "vue": "3.5.43"
-    },
     "scripts": {
         "dev": "nuxi dev .playground",
         "dev:prepare": "nuxt prepare .playground",
@@ -21,15 +12,29 @@
     },
     "type": "module",
     "dependencies": {
-        "undici": "^8.5.0"
+        "undici": "^8.11.2"
     },
     "peerDependencies": {
-        "@nuxt/ui": "4.11.1",
-        "@nuxtjs/i18n": "^10.5.0",
-        "motion-v": "2.4.4",
-        "zod": "4.6.5"
+        "@nuxt/ui": "^4.0.0",
+        "@nuxtjs/i18n": "^10.0.0",
+        "motion-v": "^2.0.0",
+        "zod": "^4.0.0"
     },
     "overrides": {
         "vite": "7.3.6"
+    },
+    "peerDependenciesMeta": {
+        "@nuxt/ui": {
+            "optional": true
+        },
+        "@nuxtjs/i18n": {
+            "optional": true
+        },
+        "motion-v": {
+            "optional": true
+        },
+        "zod": {
+            "optional": true
+        }
     }
 }

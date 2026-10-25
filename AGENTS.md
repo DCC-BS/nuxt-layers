@@ -8,11 +8,26 @@ This file provides guidance for AI agents working on this Nuxt layers monorepo.
 - `bunx biome check` - Run Biome linter to check code style and formatting issues
 - `bunx biome check --write` - Auto-fix Biome issues
 
+### Setup
+- `mise run install` - install the root test harness and every layer (run from the repo root)
+
 ### Testing
-No test suite is currently configured. To add tests:
-1. Configure a test framework (e.g., Vitest)
-2. Add test commands to layer package.json files
-3. This repository uses a monorepo structure - tests should be run per-layer
+- `mise run test` - unit tests (`tests/unit`) and the e2e suite (`tests/e2e`)
+- `mise run ci` - what CI runs: biome in every layer, `nuxt prepare` per layer, all tests
+- The e2e suite builds `tests/fixture`, an app that extends the layers from this checkout the way
+  our apps do (auth + no-auth, backend_communication, health_check, logger + pino-logger,
+  dcc-app-config, feedback-control), and calls it against a stub backend.
+- `NUXT_LAYERS_LOCAL=true` makes nested layer references (auth → backend_communication → logger)
+  resolve to this checkout instead of `github:DCC-BS/nuxt-layers/...`. Apps don't set it.
+
+### Dependencies
+- Apps install these layers with `install: true`, which runs `bun install` inside each layer. So a
+  layer's `package.json` lists only what the layer needs at runtime:
+  - packages every app already has (`@nuxt/ui`, `@nuxtjs/i18n`, `zod`, `pino`, `motion-v`,
+    `@dcc-bs/communication.bs.js`) are **optional** `peerDependencies` with a major-version range,
+    so the app's version is used and nothing is installed twice;
+  - packages only the layer uses (`undici`, `@azure/msal-node`, ...) are `dependencies`;
+  - dev tooling (nuxt, vue, typescript, vitest, ...) lives in the root `package.json` only.
 
 ## Code Style Guidelines
 

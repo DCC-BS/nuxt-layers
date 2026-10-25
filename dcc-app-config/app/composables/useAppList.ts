@@ -7,7 +7,7 @@ const apps = [
     {
         name: "Transcribo",
         slug: "transcribo",
-        image: "app-icons/app-icon-transcribo.svg"
+        image: "app-icons/app-icon-transcribo.svg",
     },
     {
         name: "BS-Übersetzer",
@@ -36,9 +36,7 @@ export type AppLink = {
 
 export function useAppList(currentAppName: AppName): AppLink[] {
     const {
-        app: {
-            baseURL
-        },
+        app: { baseURL },
         public: {
             appConfig: { appListUrlTemplate },
         },
