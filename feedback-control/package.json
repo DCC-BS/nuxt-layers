@@ -20,9 +20,6 @@
         "motion-v": "^2.0.0",
         "zod": "^4.0.0"
     },
-    "overrides": {
-        "vite": "8.3.4"
-    },
     "peerDependenciesMeta": {
         "@nuxt/ui": {
             "optional": true
