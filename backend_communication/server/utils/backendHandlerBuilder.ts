@@ -260,17 +260,17 @@ function getErrorStatus(err: unknown): number | undefined {
         return undefined;
     }
 
-    const status =
-        "statusCode" in err
-            ? err.statusCode
-            : "status" in err
-              ? err.status
-              : undefined;
+    const candidates = [
+        "statusCode" in err ? err.statusCode : undefined,
+        "status" in err ? err.status : undefined,
+    ];
 
     // Only real HTTP error codes; anything else (0, undefined, strings) stays a 500.
-    return typeof status === "number" && status >= 400 && status <= 599
-        ? status
-        : undefined;
+    return candidates.find(isHttpErrorStatus);
+}
+
+function isHttpErrorStatus(value: unknown): value is number {
+    return typeof value === "number" && value >= 400 && value <= 599;
 }
 
 function handleError(err: unknown) {
