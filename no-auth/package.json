@@ -9,6 +9,6 @@
         "build": "nuxt build .playground",
         "generate": "nuxt generate .playground",
         "preview": "nuxt preview .playground",
-        "lint": "npx bunx biome check --write ."
+        "lint": "biome check --write ."
     }
 }
