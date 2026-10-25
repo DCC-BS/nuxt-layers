@@ -22,7 +22,7 @@
     },
   },
   "overrides": {
-    "vite": "7.3.6",
+    "vite": "8.3.4",
   },
   "packages": {
     "undici": ["undici@8.11.2", "", {}, "sha512-u4UB2/IrKdU6lFxumHmmo1a3fCQO5tzQllRorfoRS63txhrB7xTpSn1PftwC4qEHkOaqP95fCWW4lJzwErwzhQ=="],
