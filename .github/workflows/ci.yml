@@ -1,0 +1,38 @@
+name: CI
+
+# Every app installs these layers straight from main, so a broken layer breaks every app's next
+# build. This checks each layer on its own (lint, nuxt prepare) and all of them together: the e2e
+# suite builds tests/fixture, which extends the layers from this checkout like our apps do, and
+# exercises the server routes, the SSR page and the backend proxy against a stub backend.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: CI (lint & test)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up mise (bun, node, biome)
+        uses: jdx/mise-action@v4
+
+      - name: Install dependencies (frozen lockfiles)
+        run: mise run install
+
+      - name: Lint every layer
+        run: mise run layers:lint
+
+      - name: Unit and e2e tests
+        run: mise run test

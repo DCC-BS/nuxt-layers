@@ -25,8 +25,10 @@ export default defineNuxtConfig({
                 includeStackTrace: true,
                 stackTraceLimit: 5,
                 logAllRequests: false,
-                breadcrumbs: DEFAULT_BREADCRUMB_CONFIG satisfies BreadcrumbConfig,
-                errorThrottle: DEFAULT_ERROR_THROTTLE_CONFIG satisfies ErrorThrottleConfig,
+                breadcrumbs:
+                    DEFAULT_BREADCRUMB_CONFIG satisfies BreadcrumbConfig,
+                errorThrottle:
+                    DEFAULT_ERROR_THROTTLE_CONFIG satisfies ErrorThrottleConfig,
             },
         },
     },

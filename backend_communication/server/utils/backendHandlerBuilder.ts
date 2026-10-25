@@ -96,17 +96,20 @@ export function backendHandlerBuilder<
     function withDummyFetcher<TNewResponse extends TResponse = TResponse>(
         dummyData: DummyFetcherData<TBody, TNewResponse>,
     ) {
-        const { withBodyProvider, withFetcher, withRawFetcher, withDummyFetcher, ...builder } =
-            backendHandlerBuilder<TRequest, TBody, TResponse, TResponse>({
-                ...ctx,
-                dummyFetcher: createDummyFetcher<TBody, TNewResponse>(
-                    dummyData,
-                ),
-                postFetchTransformer: defaultTransformer as BackendTransformer<
-                    TResponse,
-                    TResponse
-                >,
-            });
+        const {
+            withBodyProvider,
+            withFetcher,
+            withRawFetcher,
+            withDummyFetcher,
+            ...builder
+        } = backendHandlerBuilder<TRequest, TBody, TResponse, TResponse>({
+            ...ctx,
+            dummyFetcher: createDummyFetcher<TBody, TNewResponse>(dummyData),
+            postFetchTransformer: defaultTransformer as BackendTransformer<
+                TResponse,
+                TResponse
+            >,
+        });
         return builder;
     }
 
@@ -252,6 +255,24 @@ function parseUrl(url: string, event: H3Event) {
     return parsedUrl;
 }
 
+function getErrorStatus(err: unknown): number | undefined {
+    if (typeof err !== "object" || !err) {
+        return undefined;
+    }
+
+    const status =
+        "statusCode" in err
+            ? err.statusCode
+            : "status" in err
+              ? err.status
+              : undefined;
+
+    // Only real HTTP error codes; anything else (0, undefined, strings) stays a 500.
+    return typeof status === "number" && status >= 400 && status <= 599
+        ? status
+        : undefined;
+}
+
 function handleError(err: unknown) {
     let errorMessage = "An unexpected error occurred";
     let errorCode = 500;
@@ -263,17 +284,24 @@ function handleError(err: unknown) {
         errorMessage = err.message;
     }
 
-    if (typeof err === "object" && err && "statusCode" in err) {
-        if ("statusCode" in err) {
-            errorCode = err.statusCode as number;
-        }
-        if ("statusMessage" in err) {
-            statusMessage = err.statusMessage as string;
+    // H3 errors carry `statusCode`; ApiError from @dcc-bs/communication.bs.js (what the default
+    // fetcher throws for backend error responses) carries `status`.
+    const upstreamStatus = getErrorStatus(err);
+
+    if (upstreamStatus !== undefined) {
+        errorCode = upstreamStatus;
+        if (
+            typeof err === "object" &&
+            err &&
+            "statusMessage" in err &&
+            typeof err.statusMessage === "string"
+        ) {
+            statusMessage = err.statusMessage;
         }
     }
 
     // preserve error structure for client
-    if (err && typeof err === "object" && "statusCode" in err) {
+    if (upstreamStatus !== undefined) {
         throw createError({
             statusCode: errorCode,
             statusMessage: statusMessage,

@@ -30,7 +30,10 @@ export async function noBody<TRequest extends EventHandlerRequest>(
     return undefined;
 }
 
-export function defaultBodyProvider<TRequest extends EventHandlerRequest, TBody>() {
+export function defaultBodyProvider<
+    TRequest extends EventHandlerRequest,
+    TBody,
+>() {
     return undefined as BodyProvider<TRequest, TBody> | undefined;
 }
 

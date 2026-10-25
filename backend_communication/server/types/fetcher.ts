@@ -38,7 +38,9 @@ export async function defaultFetcher<TBody, TResponse>(
     const logger = getEventLogger(event);
 
     if (typeof body !== "object" && body !== undefined) {
-        throw new Error(`Request body must be object or undefined, got: ${typeof body}`);
+        throw new Error(
+            `Request body must be object or undefined, got: ${typeof body}`,
+        );
     }
 
     const response = await apiFetch(url, {
@@ -59,7 +61,8 @@ export async function defaultFetcher<TBody, TResponse>(
 export async function rawFetcher<TBody>(
     options: FetcherOptions<TBody>,
 ): Promise<Response> {
-    const body = options.body !== undefined ? JSON.stringify(options.body) : undefined;
+    const body =
+        options.body !== undefined ? JSON.stringify(options.body) : undefined;
 
     const signal = getAbortSignal(options.event);
 
