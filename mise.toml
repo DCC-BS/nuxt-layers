@@ -1,7 +1,7 @@
 [tools]
 bun = "1.4.4"
 node = "24.22.1"
-usage = "6.12.1"
+usage = "7.1.2"
 "npm:@biomejs/biome" = "2.5.15"
 
 # This is a monorepo of independent Nuxt layers. The root mise.toml pins the
