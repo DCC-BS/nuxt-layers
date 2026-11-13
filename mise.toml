@@ -1,8 +1,8 @@
 [tools]
 bun = "1.4.4"
-node = "24.22.1"
-usage = "7.1.3"
-"npm:@biomejs/biome" = "2.6.3"
+node = "24.22.2"
+usage = "7.1.4"
+"npm:@biomejs/biome" = "2.6.4"
 
 # This is a monorepo of independent Nuxt layers. The root mise.toml pins the
 # shared toolchain (bun + node) so every layer inherits the same versions when
