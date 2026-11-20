@@ -238,16 +238,26 @@ export function backendHandlerBuilder<
     };
 }
 
+// The logger layer is optional: without a bound logger, getEventLogger()
+// throws, which would turn a missing optional parameter into a 500.
+function warnMissingParameter(
+    event: H3Event,
+    fields: Record<string, string>,
+): void {
+    if (event.context.logger) {
+        getEventLogger(event).warn(fields, "Missing URL parameter");
+    } else {
+        console.warn("Missing URL parameter", fields);
+    }
+}
+
 function parseUrl(url: string, event: H3Event) {
     const query = getQuery(event);
 
     let parsedUrl = url.replace(/\[q:([^\]]+)\]/g, (_, queryName) => {
         const value = query[queryName];
         if (value === undefined || value === null) {
-            getEventLogger(event).warn(
-                { query_parameter: queryName },
-                "Missing query parameter",
-            );
+            warnMissingParameter(event, { query_parameter: queryName });
         }
         return (value as string) ?? "";
     });
@@ -255,10 +265,7 @@ function parseUrl(url: string, event: H3Event) {
     parsedUrl = parsedUrl.replace(/\[r:([^\]]+)\]/g, (_, paramName) => {
         const value = getRouterParam(event, paramName);
         if (!value) {
-            getEventLogger(event).warn(
-                { router_parameter: paramName },
-                "Missing router parameter",
-            );
+            warnMissingParameter(event, { router_parameter: paramName });
         }
         return value ?? "";
     });

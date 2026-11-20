@@ -96,6 +96,31 @@ describe("createServerPinoOptions (production)", () => {
         expect(lines[2]).toMatchObject({ error: "x", error_type: "Error" });
     });
 
+    it("keeps error fields from the selected Error when several are logged", () => {
+        const { logger, lines } = capture();
+        logger.error(
+            {
+                err: new TypeError("first"),
+                error: new RangeError("second"),
+                exception: "spoofed",
+            },
+            "two errors",
+        );
+        expect(lines[0]).toMatchObject({
+            error: "first",
+            error_type: "TypeError",
+        });
+        expect(lines[0].exception).toContain("TypeError: first");
+    });
+
+    it("never throws on an invalid Date", () => {
+        const { logger, lines } = capture();
+        expect(() =>
+            logger.info({ at: new Date(Number.NaN) }, "bad date"),
+        ).not.toThrow();
+        expect(lines[0]).toMatchObject({ at: "Invalid Date" });
+    });
+
     it("serializes nested objects and arrays to JSON strings", () => {
         const { logger, lines } = capture();
         logger.info({ options: { a: 1 }, ids: [1, 2], ok: true }, "nested");

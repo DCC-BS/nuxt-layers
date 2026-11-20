@@ -48,10 +48,11 @@ function contractLevel(label: string): Record<string, string> {
 }
 
 function stringifyValue(value: object): string {
-    if (value instanceof Date) {
-        return value.toISOString();
-    }
+    // Logging must never throw: an invalid Date throws in toISOString().
     try {
+        if (value instanceof Date) {
+            return value.toISOString();
+        }
         return JSON.stringify(value) ?? String(value);
     } catch {
         return String(value);
@@ -62,7 +63,8 @@ function stringifyValue(value: object): string {
  * Turns the object passed to a log call into contract fields:
  * - an Error under `err` or `error` (the first one found) becomes
  *   `error` (message), `error_type` (name) and `exception` (stack);
- *   any other Error value becomes a "Name: message" string,
+ *   these three fields are written last, so other keys can't overwrite
+ *   them; any other Error value becomes a "Name: message" string,
  * - nested objects and arrays become JSON strings,
  * - scalars pass through unchanged.
  */
@@ -71,17 +73,12 @@ export function toContractLogFields(
     includeStackTrace = true,
 ): Record<string, unknown> {
     const out: Record<string, unknown> = {};
-    let errorSet = false;
+    let loggedError: Error | undefined;
 
     for (const [key, value] of Object.entries(obj)) {
         if (value instanceof Error) {
-            if (ERROR_KEYS.has(key) && !errorSet) {
-                errorSet = true;
-                out.error = value.message;
-                out.error_type = value.name;
-                if (includeStackTrace && value.stack) {
-                    out.exception = value.stack;
-                }
+            if (ERROR_KEYS.has(key) && !loggedError) {
+                loggedError = value;
             } else {
                 out[key] = `${value.name}: ${value.message}`;
             }
@@ -92,6 +89,16 @@ export function toContractLogFields(
             value !== null && typeof value === "object"
                 ? stringifyValue(value)
                 : value;
+    }
+
+    if (loggedError) {
+        out.error = loggedError.message;
+        out.error_type = loggedError.name;
+        if (includeStackTrace && loggedError.stack) {
+            out.exception = loggedError.stack;
+        } else {
+            delete out.exception;
+        }
     }
 
     return out;
