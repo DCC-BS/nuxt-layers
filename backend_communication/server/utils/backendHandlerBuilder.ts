@@ -244,7 +244,10 @@ function parseUrl(url: string, event: H3Event) {
     let parsedUrl = url.replace(/\[q:([^\]]+)\]/g, (_, queryName) => {
         const value = query[queryName];
         if (value === undefined || value === null) {
-            console.warn(`Missing query parameter: ${queryName}`);
+            getEventLogger(event).warn(
+                { query_parameter: queryName },
+                "Missing query parameter",
+            );
         }
         return (value as string) ?? "";
     });
@@ -252,7 +255,10 @@ function parseUrl(url: string, event: H3Event) {
     parsedUrl = parsedUrl.replace(/\[r:([^\]]+)\]/g, (_, paramName) => {
         const value = getRouterParam(event, paramName);
         if (!value) {
-            console.warn(`Missing router parameter: ${paramName}`);
+            getEventLogger(event).warn(
+                { router_parameter: paramName },
+                "Missing router parameter",
+            );
         }
         return value ?? "";
     });
