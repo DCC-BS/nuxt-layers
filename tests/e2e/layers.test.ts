@@ -8,7 +8,13 @@ function layer(name: string): string {
     return fileURLToPath(new URL(`../../${name}`, import.meta.url));
 }
 
-type Received = { method?: string; url?: string; body: string; contentType?: string };
+type Received = {
+    method?: string;
+    url?: string;
+    body: string;
+    contentType?: string;
+    requestId?: string;
+};
 
 // A stand-in for the app's Python backend (API_URL).
 const backend = {
@@ -34,6 +40,7 @@ const backendServer = createServer(async (req, res) => {
         url: req.url,
         body,
         contentType: req.headers["content-type"],
+        requestId: req.headers["x-request-id"] as string | undefined,
     });
     res.setHeader("Content-Type", "application/json");
 
@@ -155,6 +162,19 @@ describe("backend_communication", () => {
         const result = await $fetch("/api/items");
         expect(result).toEqual({ wrapped: [1, 2, 3] });
         expect(backend.received[0]).toMatchObject({ method: "GET", url: "/items", body: "" });
+    });
+
+    it("forwards the incoming X-Request-ID to the backend", async () => {
+        await $fetch("/api/items", { headers: { "X-Request-ID": "req-1234" } });
+        expect(backend.received[0]?.requestId).toBe("req-1234");
+    });
+
+    it("generates a request id when the caller sends none (or an invalid one)", async () => {
+        await $fetch("/api/items");
+        await $fetch("/api/items", { headers: { "X-Request-ID": "not a valid id" } });
+        for (const received of backend.received) {
+            expect(received.requestId).toMatch(/^[0-9a-f-]{36}$/);
+        }
     });
 });
 

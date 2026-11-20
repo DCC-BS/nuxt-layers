@@ -204,6 +204,11 @@ export function backendHandlerBuilder<
                     body: body,
                     headers: {
                         "Content-Type": "application/json",
+                        // Set per request by the pino-logger layer; lets the
+                        // backend log under the same request_id.
+                        ...(typeof event.context.requestId === "string"
+                            ? { "X-Request-ID": event.context.requestId }
+                            : {}),
                     },
                     event,
                 });

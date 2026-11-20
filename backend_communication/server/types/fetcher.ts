@@ -51,7 +51,10 @@ export async function defaultFetcher<TBody, TResponse>(
     });
 
     if (isApiError(response)) {
-        logger.error(response, `API Error on fetch to ${url}`);
+        logger.error(
+            { err: response, error_id: response.errorId },
+            `API Error on fetch to ${url}`,
+        );
         throw response;
     }
 
