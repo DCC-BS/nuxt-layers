@@ -68,7 +68,7 @@ export async function getGraphQlAccessToken(
         } catch (refreshError) {
             if (isInteractionRequiredError(refreshError)) {
                 logger.warn(
-                    { userId: payload.userId, email: payload.email },
+                    { userId: payload.userId },
                     "Session no longer refreshable; clearing session cookie",
                 );
                 clearSessionCookie(event);
@@ -115,7 +115,7 @@ export async function getServerSession(
         } catch (refreshError) {
             if (isInteractionRequiredError(refreshError)) {
                 logger.warn(
-                    { userId: payload.userId, email: payload.email },
+                    { userId: payload.userId },
                     "Session no longer refreshable; clearing session cookie",
                 );
                 clearSessionCookie(event);

@@ -1,5 +1,6 @@
-import { type Logger, pino, type TransportTargetOptions } from "pino";
+import { type Logger, pino } from "pino";
 import { createBreadcrumbAwareLogger } from "#layers/pino-logger/shared/utils/pinoBreadcrumbWrapper";
+import { createServerPinoOptions } from "#layers/pino-logger/shared/utils/pinoOptions";
 import { useBreadcrumbs } from "../composables/useBreadcrumbs";
 
 // Singleton: pino with `transport` spawns a worker thread on creation.
@@ -8,40 +9,22 @@ import { useBreadcrumbs } from "../composables/useBreadcrumbs";
 // process instead.
 let baseLogger: Logger | undefined;
 
-function getBaseLogger(loglevel: string): Logger {
+function getBaseLogger(
+    loggerConfig: ReturnType<typeof useRuntimeConfig>["public"]["logger"],
+): Logger {
     if (baseLogger) {
         return baseLogger;
     }
 
-    const productionTargets = [
-        {
-            target: "pino/file",
-            options: { destination: 1 },
-        },
-    ] as TransportTargetOptions[];
-
-    const devTargets = [
-        {
-            target: "pino-pretty",
-            level: "trace",
-            options: {
-                colorize: false,
-            },
-        },
-    ] as TransportTargetOptions[];
-
-    baseLogger = pino({
-        base: { origin: "ssr" },
-        timestamp: true,
-        enabled: true,
-        level: loglevel,
-        transport: {
-            targets:
-                process.env.NODE_ENV === "production"
-                    ? productionTargets
-                    : devTargets,
-        },
-    });
+    baseLogger = pino(
+        createServerPinoOptions({
+            logger: "ssr",
+            app: loggerConfig.app as string | undefined,
+            level: loggerConfig.loglevel as string,
+            includeStackTrace: loggerConfig.includeStackTrace as boolean,
+            production: process.env.NODE_ENV === "production",
+        }),
+    );
 
     return baseLogger;
 }
@@ -49,8 +32,14 @@ function getBaseLogger(loglevel: string): Logger {
 export default defineNuxtPlugin(async (nuxtApp) => {
     const loggerConfig = useRuntimeConfig().public.logger;
 
+    // `requestId` is set per request by server/plugins/pinoPlugin.ts.
+    const requestId = useRequestEvent()?.context.requestId;
+    const base = getBaseLogger(loggerConfig);
+
     const logger = createBreadcrumbAwareLogger(
-        getBaseLogger(loggerConfig.loglevel as string),
+        typeof requestId === "string"
+            ? base.child({ request_id: requestId })
+            : base,
         useBreadcrumbs(),
     );
 

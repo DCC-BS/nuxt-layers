@@ -1,39 +1,29 @@
-import { pino, type TransportTargetOptions } from "pino";
+import { pino } from "pino";
 import { createBreadcrumbAwareLogger } from "#layers/pino-logger/shared/utils/pinoBreadcrumbWrapper";
+import { createServerPinoOptions } from "#layers/pino-logger/shared/utils/pinoOptions";
 import { getEventBreadcrumbManager } from "../utils/breadcrumbStorage";
+import { resolveRequestId } from "../utils/requestId";
 
 export default defineNitroPlugin((nitroApp) => {
     const loggerConfig = useRuntimeConfig().public.logger;
 
-    const productionTargets = [
-        {
-            target: "pino/file",
-            options: { destination: 1 },
-        },
-    ] as TransportTargetOptions[];
-
-    const devTargets = [
-        {
-            target: "pino-pretty",
-            options: {
-                colorize: false,
-            },
-        },
-    ] as TransportTargetOptions[];
-
-    const baseLogger = pino({
-        base: { origin: "api" },
-        level: loggerConfig.loglevel as string,
-        timestamp: true,
-        transport: {
-            targets: import.meta.dev ? devTargets : productionTargets,
-        },
-    });
+    const baseLogger = pino(
+        createServerPinoOptions({
+            logger: "api",
+            app: loggerConfig.app as string | undefined,
+            level: loggerConfig.loglevel as string,
+            includeStackTrace: loggerConfig.includeStackTrace as boolean,
+            production: !import.meta.dev,
+        }),
+    );
 
     nitroApp.hooks.hook("request", (event) => {
+        const requestId = resolveRequestId(event);
+        event.context.requestId = requestId;
+
         const breadcrumbManager = getEventBreadcrumbManager(event);
         const logger = createBreadcrumbAwareLogger(
-            baseLogger,
+            baseLogger.child({ request_id: requestId }),
             breadcrumbManager,
         );
         event.context.logger = logger;

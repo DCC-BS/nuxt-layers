@@ -1,26 +1,18 @@
 import type { H3Event } from "h3";
-import { defineEventHandler, getRequestHeader } from "h3";
+import { defineEventHandler } from "h3";
 import { getEventBreadcrumbManager } from "../utils/breadcrumbStorage";
 import { getLogThrottler } from "../utils/logThrottleStorage";
 
 export default defineEventHandler(async (event: H3Event): Promise<void> => {
+    const startedAt = performance.now();
     const method = event.node.req.method;
-    const url = event.node.req.url;
-    const remoteAddress = event.node.req.socket.remoteAddress;
-    const userAgent = getRequestHeader(event, "user-agent");
+    // Path without query string: query parameters can carry personal data.
+    const path = (event.node.req.url ?? "").split("?")[0];
     const loggerConfig = useRuntimeConfig().public.logger;
 
     const logger = getEventLogger(event);
     const breadcrumbManager = getEventBreadcrumbManager(event);
     const logThrottler = getLogThrottler();
-
-    const requestInfo = {
-        method,
-        url,
-        remoteAddress,
-        userAgent,
-        timestamp: new Date().toISOString(),
-    };
 
     if (
         loggerConfig.breadcrumbs?.enabled &&
@@ -29,31 +21,36 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
         breadcrumbManager.addBreadcrumb({
             category: "http",
             type: "http",
-            message: `${method} ${url}`,
+            message: `${method} ${path}`,
             level: "info",
             data: {
                 method,
-                url,
-                remoteAddress,
-                userAgent,
+                path,
             },
         });
     }
 
-    if (loggerConfig.logAllRequests) {
-        logger.info(requestInfo, "Incoming request");
-        return;
-    }
-
     event.node.res.on("finish", () => {
         const statusCode = event.node.res.statusCode;
+        const requestInfo = {
+            event: "request_finished",
+            method,
+            path,
+            status_code: statusCode,
+            duration_s: Number(
+                ((performance.now() - startedAt) / 1000).toFixed(4),
+            ),
+        };
 
         if (statusCode < 400) {
+            if (loggerConfig.logAllRequests) {
+                logger.info(requestInfo, `${method} ${path} ${statusCode}`);
+            }
             return;
         }
 
         const throttleResult = logThrottler.check(
-            `${method} ${url} ${statusCode}`,
+            `${method} ${path} ${statusCode}`,
         );
 
         if (throttleResult.summary) {
@@ -82,18 +79,12 @@ export default defineEventHandler(async (event: H3Event): Promise<void> => {
                 level: "error",
                 data: {
                     method,
-                    url,
+                    path,
                     statusCode,
                 },
             });
         }
 
-        logger.error(
-            {
-                ...requestInfo,
-                statusCode,
-            },
-            `Failed request (${statusCode})`,
-        );
+        logger.error(requestInfo, `Failed request (${statusCode})`);
     });
 });

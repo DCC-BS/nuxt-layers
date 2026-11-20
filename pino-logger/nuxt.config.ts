@@ -19,6 +19,9 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             logger: {
+                // `app` field of every server log line (log contract), e.g.
+                // "text-mate-frontend". Set NUXT_PUBLIC_LOGGER_APP; omitted when empty.
+                app: "",
                 loglevel: (process.env.NODE_ENV === "production"
                     ? "warn"
                     : "debug") satisfies LogLevel,

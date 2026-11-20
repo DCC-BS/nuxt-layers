@@ -21,6 +21,12 @@ const LOG_LEVELS = [
 
 type LogLevelKey = (typeof LOG_LEVELS)[number];
 
+const BREADCRUMB_LEVELS: ReadonlySet<LogLevelKey> = new Set([
+    "fatal",
+    "error",
+    "warn",
+]);
+
 function mapPinoLevelToBreadcrumbLevel(level: LogLevelKey): BreadcrumbLevel {
     const levelMap: Record<LogLevelKey, BreadcrumbLevel> = {
         fatal: "fatal",
@@ -56,7 +62,7 @@ class BreadcrumbAwareLogger implements BaseLogger {
 
         // first argument is the data if it's an object, otherwise undefined
         const data =
-            args.length > 1 && typeof args[0] === "object"
+            args.length > 0 && typeof args[0] === "object" && args[0] !== null
                 ? args[0]
                 : undefined;
 
@@ -67,10 +73,15 @@ class BreadcrumbAwareLogger implements BaseLogger {
             data: data as Record<string, unknown> | undefined,
         });
 
-        // Include breadcrumbs in the log data
+        // Attach the breadcrumb trail to warnings and errors only: that is
+        // where it explains what led up to the problem. An Error goes under
+        // `err` (pino's error key): spreading it would drop message and
+        // stack, which are not enumerable.
         const logData = {
-            breadcrumbs: this.breadcrumbManager.getBreadcrumbs(),
-            ...(data || {}),
+            ...(BREADCRUMB_LEVELS.has(level)
+                ? { breadcrumbs: this.breadcrumbManager.getBreadcrumbs() }
+                : {}),
+            ...(data instanceof Error ? { err: data } : data || {}),
         };
 
         if (message) {
