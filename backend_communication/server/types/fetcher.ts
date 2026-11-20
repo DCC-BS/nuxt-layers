@@ -52,8 +52,15 @@ export async function defaultFetcher<TBody, TResponse>(
 
     if (isApiError(response)) {
         logger.error(
-            { err: response, error_id: response.errorId },
-            `API Error on fetch to ${url}`,
+            {
+                error: response.message,
+                error_type: "ApiError",
+                error_id: response.errorId,
+                status_code: response.status,
+                debug_message: response.debugMessage?.slice(0, 500),
+            },
+            // Without query string: it can carry personal data.
+            `API Error on fetch to ${url.split("?")[0]}`,
         );
         throw response;
     }

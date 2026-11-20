@@ -18,8 +18,9 @@ In production (`NODE_ENV=production`) both server-side loggers (SSR, `logger: "s
 - `app` comes from `runtimeConfig.public.logger.app`; set `NUXT_PUBLIC_LOGGER_APP` (e.g. `text-mate-frontend`). Left out when empty.
 - `request_id` is the incoming `X-Request-ID` header (if it looks like an id) or a new UUID. It is stored in `event.context.requestId`; the `backend_communication` layer forwards it to the backend as `X-Request-ID`.
 - An `Error` passed to the logger (`logger.error(err, "msg")` or `{ err }` / `{ error }`) becomes `error` (message), `error_type` (name) and `exception` (stack; omitted when `includeStackTrace` is `false`).
-- Nested objects and arrays in the log object are written as JSON strings. Log flat scalar fields instead.
-- Warnings and errors carry the breadcrumb trail as a JSON string in `breadcrumbs`.
+- Nested objects and arrays in the log object are written as JSON strings under `<key>_json` (`{ options: {...} }` → `options_json`). The new key keeps the string from clashing in OpenSearch with the object type older versions wrote under `<key>`. Log flat scalar fields instead.
+- Keys that the logger writes itself (`message`, `level`, `timestamp`, `app`, `logger`, `request_id`) are renamed to `<key>_field` when they appear in the log object, so a line never has duplicate keys.
+- Warnings and errors carry the breadcrumb trail as a JSON string in `breadcrumbs_json`.
 - The request middleware logs `event: "request_finished"` with `method`, `path` (no query string), `status_code` and `duration_s`: failed requests (status >= 400) at `error`, all others at `info` when `logAllRequests` is `true`.
 
 In development the output goes through `pino-pretty` as before.

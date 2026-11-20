@@ -121,14 +121,50 @@ describe("createServerPinoOptions (production)", () => {
         expect(lines[0]).toMatchObject({ at: "Invalid Date" });
     });
 
+    it("never throws on unserializable values", () => {
+        const { logger, lines } = capture();
+        const nullProto = Object.create(null) as Record<string, unknown>;
+        nullProto.self = nullProto;
+        const cyclic: Record<string, unknown> = { big: 10n };
+        cyclic.self = cyclic;
+        expect(() =>
+            logger.info({ nullProto, cyclic }, "unserializable"),
+        ).not.toThrow();
+        expect(lines[0]).toMatchObject({
+            nullProto_json: '{"self":"[Circular]"}',
+            cyclic_json: '{"big":"10","self":"[Circular]"}',
+        });
+    });
+
+    it("renames keys that pino writes itself", () => {
+        const { logger, lines } = capture("text-mate-frontend");
+        logger
+            .child({ request_id: "abc" })
+            .error(
+                { message: "from obj", level: 3, app: "x", request_id: "y" },
+                "dup",
+            );
+        expect(lines[0]).toMatchObject({
+            message: "dup",
+            message_field: "from obj",
+            level: "error",
+            level_field: 3,
+            app: "text-mate-frontend",
+            app_field: "x",
+            request_id: "abc",
+            request_id_field: "y",
+        });
+    });
+
     it("serializes nested objects and arrays to JSON strings", () => {
         const { logger, lines } = capture();
         logger.info({ options: { a: 1 }, ids: [1, 2], ok: true }, "nested");
         expect(lines[0]).toMatchObject({
-            options: '{"a":1}',
-            ids: "[1,2]",
+            options_json: '{"a":1}',
+            ids_json: "[1,2]",
             ok: true,
         });
+        expect(lines[0]).not.toHaveProperty("options");
     });
 
     it("works through the breadcrumb wrapper (Error, breadcrumbs)", () => {
@@ -145,8 +181,9 @@ describe("createServerPinoOptions (production)", () => {
         wrapped.error(new Error("kaputt"), "second");
         wrapped.warn({ status_code: 503 });
 
-        expect(lines[0]).not.toHaveProperty("breadcrumbs");
-        expect(typeof lines[1].breadcrumbs).toBe("string");
+        expect(lines[0]).not.toHaveProperty("breadcrumbs_json");
+        expect(typeof lines[1].breadcrumbs_json).toBe("string");
+        expect(lines[1]).not.toHaveProperty("breadcrumbs");
         expect(lines[1]).toMatchObject({
             message: "second",
             error: "kaputt",

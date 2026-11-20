@@ -39,6 +39,17 @@ const CONTRACT_LEVELS: Record<string, string> = {
 
 const ERROR_KEYS = new Set(["err", "error"]);
 
+// Written by pino itself (base, child bindings, message, timestamp). A logged
+// object with one of these keys would produce a duplicate JSON key.
+const RESERVED_KEYS = new Set([
+    "message",
+    "level",
+    "timestamp",
+    "app",
+    "logger",
+    "request_id",
+]);
+
 function contractTimestamp(): string {
     return `,"timestamp":"${new Date().toISOString()}"`;
 }
@@ -47,16 +58,40 @@ function contractLevel(label: string): Record<string, string> {
     return { level: CONTRACT_LEVELS[label] ?? label };
 }
 
-function stringifyValue(value: object): string {
-    // Logging must never throw: an invalid Date throws in toISOString().
-    try {
-        if (value instanceof Date) {
-            return value.toISOString();
+// JSON.stringify replacer that turns BigInt into strings and repeated
+// (e.g. circular) references into "[Circular]", so it does not throw.
+function safeReplacer(): (key: string, value: unknown) => unknown {
+    const seen = new WeakSet<object>();
+    return (_key, value) => {
+        if (typeof value === "bigint") {
+            return value.toString();
         }
-        return JSON.stringify(value) ?? String(value);
+        if (value !== null && typeof value === "object") {
+            if (seen.has(value)) {
+                return "[Circular]";
+            }
+            seen.add(value);
+        }
+        return value;
+    };
+}
+
+// Logging must never throw (an invalid Date throws in toISOString(),
+// String() throws on null-prototype objects).
+function stringifyValue(value: object): string {
+    try {
+        return JSON.stringify(value, safeReplacer()) ?? String(value);
     } catch {
-        return String(value);
+        try {
+            return String(value);
+        } catch {
+            return "[unserializable]";
+        }
     }
+}
+
+function dateToString(value: Date): string {
+    return Number.isNaN(value.getTime()) ? "Invalid Date" : value.toISOString();
 }
 
 /**
@@ -65,8 +100,12 @@ function stringifyValue(value: object): string {
  *   `error` (message), `error_type` (name) and `exception` (stack);
  *   these three fields are written last, so other keys can't overwrite
  *   them; any other Error value becomes a "Name: message" string,
- * - nested objects and arrays become JSON strings,
- * - scalars pass through unchanged.
+ * - nested objects and arrays become JSON strings under `<key>_json`
+ *   (`breadcrumbs` -> `breadcrumbs_json`): a new key, so the string can't
+ *   clash with the object type older app versions wrote under `<key>`,
+ * - keys pino writes itself (`message`, `level`, `timestamp`, `app`,
+ *   `logger`, `request_id`) are renamed to `<key>_field`,
+ * - scalars and Dates (as ISO string) pass through unchanged.
  */
 export function toContractLogFields(
     obj: Record<string, unknown>,
@@ -76,19 +115,24 @@ export function toContractLogFields(
     let loggedError: Error | undefined;
 
     for (const [key, value] of Object.entries(obj)) {
+        const outKey = RESERVED_KEYS.has(key) ? `${key}_field` : key;
+
         if (value instanceof Error) {
             if (ERROR_KEYS.has(key) && !loggedError) {
                 loggedError = value;
             } else {
-                out[key] = `${value.name}: ${value.message}`;
+                out[outKey] = `${value.name}: ${value.message}`;
             }
             continue;
         }
 
-        out[key] =
-            value !== null && typeof value === "object"
-                ? stringifyValue(value)
-                : value;
+        if (value instanceof Date) {
+            out[outKey] = dateToString(value);
+        } else if (value !== null && typeof value === "object") {
+            out[`${outKey}_json`] = stringifyValue(value);
+        } else {
+            out[outKey] = value;
+        }
     }
 
     if (loggedError) {
